@@ -21,7 +21,6 @@ function ValidationFunction(runTimeParams)
 %% Clear
 ieInit;
 
-
 %% Hello
 UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 outputDir = sprintf('%s_Output',mfilename);
