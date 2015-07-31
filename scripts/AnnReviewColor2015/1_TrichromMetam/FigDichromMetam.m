@@ -148,10 +148,10 @@ imshow(theSpdDeutanSRGBImage);
 subplot(2,2,4);
 imshow(theMetamerDeutanSRGBImage);
 
-imwrite(theSpdSRGBImage,['theSpdSRGBImage' '.' figParams.imType],figParams.imType);
-imwrite(theMetamerSRGBImage,['theMetamerSRGBImage' '.' figParams.imType],figParams.imType);
-imwrite(theSpdDeutanSRGBImage,['theSpdDeutanSRGBImage' '.' figParams.imType],figParams.imType);
-imwrite(theMetamerDeutanSRGBImage,['theMetamerDeutanSRGBImage' '.' figParams.imType],figParams.imType);
+imwrite(theSpdSRGBImage,fullfile(outputDir,[mfilename '_' 'theSpdSRGBImage' '.' figParams.imType]),figParams.imType);
+imwrite(theMetamerSRGBImage,fullfile(outputDir,[mfilename '_' 'theMetamerSRGBImage' '.' figParams.imType]),figParams.imType);
+imwrite(theSpdDeutanSRGBImage,fullfile(outputDir,[mfilename '_' 'theSpdDeutanSRGBImage' '.' figParams.imType]),figParams.imType);
+imwrite(theMetamerDeutanSRGBImage,fullfile(outputDir,[mfilename '_' 'theMetamerDeutanSRGBImage' '.' figParams.imType]),figParams.imType);
 
 % Check the output scaling of the SRGB images.
 SRGBMaxVal = max([theSpdSRGBImage(:)' theMetamerSRGBImage(:)' theSpdDeutanSRGBImage(:)' theMetamerDeutanSRGBImage(:)']);
