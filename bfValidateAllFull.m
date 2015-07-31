@@ -38,7 +38,8 @@ function bfValidateAllFull
         rootDir = UnitTest.getPref('validationRootDir');
 
         % List of script directories to validate
-        vScriptsList = bfValidateListAllValidationDirs;
+        listingScript = UnitTest.getPref('listingScript');
+        vScriptsList = eval(listingScript);
         
     else
         % Alternatively, you can provide a list of scripts to validate. 
@@ -51,7 +52,7 @@ function bfValidateAllFull
         rootDir = UnitTest.getPref('validationRootDir');
         
         vScriptsList = {...
-                {fullfile(rootDir, 'scripts', 'AnnReviewColor2015', '2_ConePlanes')} ... 
+                {fullfile(rootDir, 'scripts', 'AnnReviewColor2015')} ... 
             };
     end
     

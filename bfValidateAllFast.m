@@ -34,7 +34,9 @@ function bfValidateAllFast
         % At the moment only the 'generatePlots' pref can be overriden.
 
         % List of script directories to validate
-        vScriptsList = bfValidateListAllValidationDirs;
+        listingScript = UnitTest.getPref('listingScript');
+        vScriptsList = eval(listingScript);
+        
     else
         % Alternatively, you can provide a list of scripts to validate. 
         % In this case each entry contains a cell array with 

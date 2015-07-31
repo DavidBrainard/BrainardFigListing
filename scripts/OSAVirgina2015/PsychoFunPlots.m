@@ -11,9 +11,8 @@ end
 
 function ValidationFunction(runTimeParams)
 
-
-%% Clear and close
-clear; close all;
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
 %% Figure parameters
 curDir = pwd;

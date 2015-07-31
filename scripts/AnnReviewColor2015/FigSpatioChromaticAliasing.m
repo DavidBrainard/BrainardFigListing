@@ -1,5 +1,4 @@
 function varargout = FigSpatioChromaticAliasing(varargin)
-% FigSpatioChromaticAliasing
 %
 % Produce a spatiochromatic alias for mosaic responses to a charomatic uniform field.
 %

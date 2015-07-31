@@ -22,9 +22,6 @@ end
 
 function ValidationFunction(runTimeParams)
 
-%% Clear and close
-clear; close all;
-
 %% Hello
 UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
@@ -49,6 +46,10 @@ end
 %% Load the calcParams used for this set of data
 calcIDStr = 'StaticPhoton';
 dataBaseDir = getpref('BLIlluminationDiscriminationCalcs', 'DataBaseDir');
+if (~exist(dataBaseDir,'dir'))
+    fprintf('You will need to get the model data to run this function\n');
+    return;
+end
 dataFilePath = fullfile(dataBaseDir, 'SimpleChooserData', calcIDStr, ['psychofitSummary' calcIDStr]);
 compObserverSummaryNeutral = load(dataFilePath);
 dataFilePath = fullfile(dataBaseDir, 'SimpleChooserData', calcIDStr, ['blueIllumComparison' calcIDStr]);

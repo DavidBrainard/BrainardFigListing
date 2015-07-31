@@ -1,15 +1,23 @@
-% IllumExampleImages
-%
+function varargout = ImageExamples(varargin)
+% 
 % Get some example images for use in talks/posters.
 %
 % This isn't really done, because we want sRGB and not
 % the settings for our lab monitors.  And maybe some
 % scaling.
 %
+% Interacts with modeling project and is unlikely to be of general
+% interest.
+%
 % 6/7/15  dhb  Wrote it.
 
-%% Clear
-clear; close all;
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+function ValidationFunction(runTimeParams)
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
 %% Start grabbing them
 outputDir = 'xImageExamples';
@@ -18,7 +26,11 @@ if (~exist(outputDir,'dir'))
 end
 
 %% Get base dir
-imageBaseDir = '/Volumes/ColorShare1/Users/Shared/Matlab/Analysis/BLIlluminationDiscriminationCalcs/Data/ImageData';
+imageBaseDir = '/Volumes/ColorShare1/Users/Shared/Matlab/Analysis/BLIlluminationDiscriminationCalcs/Data/ImageData/Neutral';
+if (~exist(imageBaseDir,'dir'))
+    fprintf('You will need to get the image data to run this function\n');
+    return;
+end
 
 %% Get size to pull out
 yRegion = 392:390+480;
@@ -50,3 +62,5 @@ imwrite(imresize(theImage,sizeFactor),fullfile(outputDir,'blueImage40.tiff'),'ti
 theImageData = load(fullfile(imageBaseDir,'BlueIllumination','blue50L-RGB.mat'));
 theImage = theImageData.sensorImageLeftRGB(yRegion,xRegion,:);
 imwrite(imresize(theImage,sizeFactor),fullfile(outputDir,'blueImage50.tiff'),'tiff');
+
+end
