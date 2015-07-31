@@ -1,0 +1,818 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>FigSpatioChromaticAliasing</title><meta name="generator" content="MATLAB 8.4"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2015-07-31"><meta name="DC.source" content="FigSpatioChromaticAliasing.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h2>Contents</h2><div><ul><li><a href="#2">Clear, define, etc.</a></li><li><a href="#3">Hello</a></li><li><a href="#4">Supress irritating warnings</a></li><li><a href="#6">Frozen noise, so that we can validate OK</a></li><li><a href="#7">Figure parameters</a></li><li><a href="#8">Compute parameters</a></li><li><a href="#9">Set up optical image</a></li><li><a href="#10">Set up sensor</a></li><li><a href="#11">Compute a metameric pair</a></li><li><a href="#12">Create the scene</a></li><li><a href="#13">Look at scenes</a></li><li><a href="#14">Compute optical images and look at them</a></li><li><a href="#15">Make sensor images</a></li><li><a href="#16">Create dichromatic versions of the same sensor, and compute those images</a></li><li><a href="#17">Check dichromatic sensor response arrays</a></li><li><a href="#18">Isetbio cone demosaicing</a></li><li><a href="#19">Create the spatiochromatic metamer</a></li><li><a href="#20">Demosaic to get metamers</a></li><li><a href="#21">Size of image definitions</a></li><li><a href="#22">Make and write mosaic images</a></li><li><a href="#23">Make and write images showing responses</a></li><li><a href="#24">Write out images for figures</a></li><li><a href="#26">Restore warning state</a></li><li><a href="#27">Rethrow error</a></li></ul></div><pre class="codeinput"><span class="keyword">function</span> varargout = FigSpatioChromaticAliasing(varargin)
+<span class="comment">%</span>
+<span class="comment">% Produce a spatiochromatic alias for mosaic responses to a charomatic uniform field.</span>
+<span class="comment">%</span>
+<span class="comment">% The output of this script isn't currently used in the Annual Review</span>
+<span class="comment">% paper, but It might be eventually.  It also produces figures that I may</span>
+<span class="comment">% want for my ARVO 2015 talk.</span>
+<span class="comment">%</span>
+<span class="comment">% Based originally on FigBasicAliasing.</span>
+<span class="comment">%</span>
+<span class="comment">% 3/23/15   dhb  Wrote it.</span>
+<span class="comment">% 4/20/15   dhb  Bring into the validation fold.% 6/29/15 dhb   Fix way we set up coneP to be more robust --  old less robust code got broken</span>
+<span class="comment">%                by some lower level change.</span>
+
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+<span class="keyword">end</span>
+
+<span class="keyword">function</span> ValidationFunction(runTimeParams)
+</pre><h2>Clear, define, etc.<a name="2"></a></h2><pre class="codeinput">ieInit;
+</pre><h2>Hello<a name="3"></a></h2><pre class="codeinput">UnitTest.validationRecord(<span class="string">'SIMPLE_MESSAGE'</span>, sprintf(<span class="string">'%s'</span>,mfilename));
+outputDir = sprintf(<span class="string">'%s_Output'</span>,mfilename);
+<span class="keyword">if</span> (~exist(outputDir,<span class="string">'dir'</span>))
+    mkdir(outputDir);
+<span class="keyword">end</span>
+</pre><h2>Supress irritating warnings<a name="4"></a></h2><pre class="codeinput">warnS = warning(<span class="string">'off'</span>,<span class="string">'images:initSize:adjustingMag'</span>);
+<span class="keyword">try</span>
+</pre><h2>Frozen noise, so that we can validate OK<a name="6"></a></h2><pre class="codeinput">    randomSeedValue = 26;
+    rng(randomSeedValue);
+</pre><h2>Figure parameters<a name="7"></a></h2><pre class="codeinput">    curDir = pwd;
+    masterFigParamsDir = getpref(<span class="string">'bfScripts'</span>,<span class="string">'masterFigParamsDir'</span>);
+    cd(masterFigParamsDir);
+    figParams = MasterFigParams;
+    cd(curDir);
+    <span class="keyword">if</span> (exist(<span class="string">'../SecondaryFigParams'</span>,<span class="string">'file'</span>))
+        cd <span class="string">..</span>
+        figParams = SecondaryFigParams(figParams);
+        cd(curDir);
+    <span class="keyword">end</span>
+    figParams.resizeScale = 1;
+    UnitTest.validationData(<span class="string">'figParams'</span>, figParams);
+</pre><h2>Compute parameters<a name="8"></a></h2><pre class="codeinput">    <span class="keyword">if</span> (runTimeParams.inStandAloneMode)
+        sceneDegrees = 3;
+        extractDegrees = 1;
+        gratingCpd = 0;
+        SCALESRGBMethod = 1;
+        outputSuffix = sprintf(<span class="string">'_%dcpd'</span>,gratingCpd);
+        <span class="comment">% This branch is executed when you run from a validation script, and</span>
+        <span class="comment">% should be left alone so that the parameters at runtime match those used</span>
+        <span class="comment">% when the validation data were stored.</span>
+    <span class="keyword">else</span>
+        sceneDegrees = 3;
+        extractDegrees = 1;
+        gratingCpd = 0;
+        SCALESRGBMethod = 1;
+        outputSuffix = sprintf(<span class="string">'_%dcpd'</span>,gratingCpd);
+    <span class="keyword">end</span>
+</pre><h2>Set up optical image<a name="9"></a></h2><p>I don't think this code actually turns off the optics at present.  What looks like it would work is to insert optics = opticsSet(optics,'model','skip') in place of the current set of 'otf method'.</p><pre class="codeinput">    oi = oiCreate(<span class="string">'human'</span>);
+    optics = oiGet(oi,<span class="string">'optics'</span>);
+    optics = opticsSet(optics,<span class="string">'off axis method'</span>,<span class="string">'skip'</span>);
+    optics = opticsSet(optics,<span class="string">'otf method'</span>,<span class="string">'skip otf'</span>);
+    oi     = oiSet(oi,<span class="string">'optics'</span>,optics);
+</pre><h2>Set up sensor<a name="10"></a></h2><p>Do this early to get cone spectral sensitivities</p><p>The isetbio cone default is for 200 linear cones per degree in the fovea. This seems high for the central 1 degree overall, but might be correct right at the center.  So we adjust via pixel size.</p><pre class="codeinput">    coneP = coneCreate(<span class="string">'human'</span>);
+    coneP = coneSet(coneP,<span class="string">'spatial density'</span>,[0.0 0.625 0.325 .05]);
+    sensorTrichrom = sensorCreate(<span class="string">'human'</span>,[],coneP);
+    sensorTrichrom = sensorSet(sensorTrichrom, <span class="string">'noise flag'</span>, 0);
+    sensorTrichrom = sensorSet(sensorTrichrom,<span class="string">'exp time'</span>,2);
+    sensorTrichrom = sensorSet(sensorTrichrom,<span class="string">'rows'</span>,128);
+    sensorTrichrom = sensorSet(sensorTrichrom,<span class="string">'cols'</span>,128);
+    pixel = sensorGet(sensorTrichrom,<span class="string">'pixel'</span>);
+    pixel = pixelSet(pixel,<span class="string">'sizesamefillfactor'</span>,(200/120)*[1.5e-6 1.5e-6]);
+    sensorTrichrom = sensorSet(sensorTrichrom,<span class="string">'pixel'</span>,pixel);
+</pre><h2>Compute a metameric pair<a name="11"></a></h2><p>This follows FigDichromMetam so that what we do here is matched to what we do there.</p><pre class="codeinput">    <span class="comment">% Cone sensitivities.  Let's be pros and show unnormalized quantal</span>
+    <span class="comment">% sensitivities.  And, use isetbio to generate the data for the plots.</span>
+    wave = sensorGet(sensorTrichrom,<span class="string">'wave'</span>);
+    S_in = WlsToS(wave);
+    T_conesQE_in = sensorGet(sensorTrichrom,<span class="string">'spectral qe'</span>)';
+    S = S_in;
+    wls = SToWls(S);
+    T_conesQETrichrom = SplineCmf(S_in,T_conesQE_in(2:4,:),S);
+    T_conesQEDichrom = SplineCmf(S_in,T_conesQE_in([2 4],:),S);
+    UnitTest.validationData(<span class="string">'S'</span>, S);
+    UnitTest.validationData(<span class="string">'T_conesQETrichrom'</span>, T_conesQETrichrom);
+    UnitTest.validationData(<span class="string">'T_conesQEDichrom'</span>, T_conesQEDichrom);
+
+    <span class="comment">% Energy sensitivities.  We need these to convert the isomerizations into</span>
+    <span class="comment">% the right relative scaling for SRGB rendering.</span>
+    T_conesTrichrom = EnergyToQuanta(S,T_conesQETrichrom')';
+    T_conesTrichrom = T_conesTrichrom/max(T_conesTrichrom(:));
+    <span class="keyword">for</span> ii = 1:3
+        renderingScaleFactors(ii) = 1/max(T_conesTrichrom(ii,:));
+    <span class="keyword">end</span>
+
+    <span class="comment">% Color matching functions</span>
+    load(<span class="string">'T_xyz1931'</span>);
+    T_xyz = SplineCmf(S_xyz1931,T_xyz1931,S);
+    UnitTest.validationData(<span class="string">'T_xyz'</span>, T_xyz);
+
+    <span class="comment">% Some spectra.  We treat these as in quantal units, though since we never</span>
+    <span class="comment">% say in the paper what they are, it doesn't really matter where we got</span>
+    <span class="comment">% them.</span>
+    load <span class="string">sur_mccBabel</span>
+    theSpd = SplineSpd(S_mccBabel,<span class="keyword">...</span>
+        figParams.spectralConstant*ones(size(sur_mccBabel(:,figParams.whichMCCSquare))) + <span class="keyword">...</span>
+        figParams.mccSquareScale*sur_mccBabel(:,figParams.whichMCCSquare) + <span class="keyword">...</span>
+        figParams.mccSquareScale2*sur_mccBabel(:,figParams.whichMCCSquare2) + <span class="keyword">...</span>
+        figParams.mccSquareScale3*sur_mccBabel(:,figParams.whichMCCSquare3),S);
+    theSpd = 1e18*theSpd/max(theSpd(:));
+    theSpdConesDichrom = T_conesQEDichrom*theSpd;
+    theSpdConesTrichrom = T_conesQETrichrom*theSpd;
+    UnitTest.validationData(<span class="string">'theSpd'</span>, theSpd);
+    UnitTest.validationData(<span class="string">'theSpdConesDichrom'</span>, theSpdConesDichrom);
+    UnitTest.validationData(<span class="string">'theSpdConesTrichrom'</span>, theSpdConesTrichrom);
+
+    <span class="comment">% Some monitor primaries</span>
+    load <span class="string">B_monitor</span>
+    B = SplineSpd(S_monitor,B_monitor(:,2:3),S);
+    UnitTest.validationData(<span class="string">'B'</span>, B);
+
+    <span class="comment">% Compute monitor metamer for spd</span>
+    theMetamer = B*inv(T_conesQEDichrom*B)*T_conesQEDichrom*theSpd;
+    theMetamerConesDichrom = T_conesQEDichrom*theMetamer;
+    theMetamerConesTrichrom = T_conesQETrichrom*theMetamer;
+    UnitTest.validationData(<span class="string">'theMetamer'</span>, theMetamer);
+    UnitTest.validationData(<span class="string">'theMetamerConesDichrom'</span>, theMetamerConesDichrom);
+    UnitTest.validationData(<span class="string">'theMetamerConesTrichrom'</span>, theMetamerConesTrichrom);
+</pre><h2>Create the scene<a name="12"></a></h2><p>Spatially uniform field scene</p><pre class="codeinput">    parms.freq = round(gratingCpd*sceneDegrees); parms.contrast = 1; parms.ph = 0;
+    parms.ang= 0; parms.row = 600; parms.col = 600; parms.GaborFlag=0;
+    scene = sceneCreate(<span class="string">'harmonic'</span>,parms);
+    scene = sceneSet(scene,<span class="string">'wave'</span>,wave(:));
+    scene = sceneSet(scene,<span class="string">'fov'</span>,sceneDegrees);
+    scenePhotonsOriginal = sceneGet(scene,<span class="string">'photons'</span>);
+    [mScene,nScene,~] = size(scenePhotonsOriginal);
+
+    <span class="comment">% Create versions with our desired spectra</span>
+    scenePhotonsSpd = zeros(size(scenePhotonsOriginal));
+    scenePhotonsMetamer = zeros(size(scenePhotonsOriginal));
+    <span class="keyword">for</span> w = 1:length(wave)
+        scenePhotonsSpd(:,:,w) = theSpd(w);
+        scenePhotonsMetamer(:,:,w) = theMetamer(w);
+    <span class="keyword">end</span>
+    sceneSpd = sceneSet(scene,<span class="string">'photons'</span>,scenePhotonsSpd);
+    sceneSpd = sceneSet(sceneSpd,<span class="string">'name'</span>,<span class="string">'theSpd'</span>);
+    sceneMetamer = sceneSet(scene,<span class="string">'photons'</span>,scenePhotonsMetamer);
+    sceneMetamer = sceneSet(sceneMetamer,<span class="string">'name'</span>,<span class="string">'theMetamer'</span>);
+    UnitTest.validationData(<span class="string">'sceneSpd'</span>, sceneSpd);
+    UnitTest.validationData(<span class="string">'sceneMetamer'</span>, sceneMetamer);
+</pre><h2>Look at scenes<a name="13"></a></h2><p>These match up pretty well with what happens in FigDichromMetam.</p><pre class="codeinput">    vcAddAndSelectObject(sceneSpd);
+    vcAddAndSelectObject(sceneMetamer); sceneWindow;
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_01.png" alt=""> <h2>Compute optical images and look at them<a name="14"></a></h2><pre class="codeinput">    oiSpd = oiCompute(oi,sceneSpd);
+    oiSpd = oiSet(oiSpd,<span class="string">'name'</span>,<span class="string">'theSpd'</span>);
+    oiMetamer = oiCompute(oi,sceneMetamer);
+    oiMetamer = oiSet(oiMetamer,<span class="string">'name'</span>,<span class="string">'theMetamer'</span>);
+    [mOi,nOi,~] = size(oiGet(oiSpd,<span class="string">'photons'</span>));
+    vcAddAndSelectObject(oiSpd);
+    vcAddAndSelectObject(oiMetamer); oiWindow;
+    UnitTest.validationData(<span class="string">'oiSpd'</span>, oiSpd);
+    UnitTest.validationData(<span class="string">'oiMetamer'</span>, oiMetamer);
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_02.png" alt=""> <h2>Make sensor images<a name="15"></a></h2><pre class="codeinput">    [sensorTrichrom, ~] = sensorSetSizeToFOV(sensorTrichrom,sceneDegrees,scene,oi);
+    sensorTrichromSpd = sensorCompute(sensorTrichrom,oiSpd);
+    sensorTrichromSpd = sensorSet(sensorTrichromSpd,<span class="string">'name'</span>,<span class="string">'theTrichromSpd'</span>);
+    sensorTrichromMetamer = sensorCompute(sensorTrichrom,oiMetamer);
+    sensorTrichromMetamer = sensorSet(sensorTrichromMetamer,<span class="string">'name'</span>,<span class="string">'theTrichromMetamer'</span>);
+    vcAddAndSelectObject(sensorTrichromSpd);
+    vcAddAndSelectObject(sensorTrichromMetamer);
+    sensorWindow(<span class="string">'scale'</span>,1);
+    UnitTest.validationData(<span class="string">'sensorTrichromSpd'</span>, sensorTrichromSpd);
+    UnitTest.validationData(<span class="string">'sensorTrichromMetamer'</span>, sensorTrichromMetamer);
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_03.png" alt=""> <h2>Create dichromatic versions of the same sensor, and compute those images<a name="16"></a></h2><p>Start with the trichromatic version</p><pre class="codeinput">    sensorDichrom = sensorTrichrom;
+
+    <span class="comment">% Turn every instance of a 3 in the cfa into a 2.</span>
+    cfaPatternTrichrom = sensorGet(sensorTrichrom,<span class="string">'pattern'</span>);
+    cfaCheckTrichrom = sensorGet(sensorTrichrom,<span class="string">'cone type'</span>);
+    <span class="keyword">if</span> (any(abs(cfaPatternTrichrom-cfaCheckTrichrom)))
+        error(<span class="string">'CFA inconsistency in trichromatic sensor structure'</span>);
+    <span class="keyword">end</span>
+    cfaPatternDichrom = cfaPatternTrichrom;
+    cfaPatternDichrom(cfaPatternDichrom == 3) = 2;
+
+    <span class="comment">% Adjust the spatial densities to match what we did to the CFA.</span>
+    coneTrichrom = sensorGet(sensorTrichrom,<span class="string">'human cone'</span>);
+    spatialDensityTrichrom = coneGet(coneTrichrom,<span class="string">'spatial density'</span>);
+    spatialDensityDichrom = spatialDensityTrichrom;
+    spatialDensityDichrom(2) = spatialDensityTrichrom(2)+spatialDensityTrichrom(3);
+    spatialDensityDichrom(3) = 0;
+
+    <span class="comment">% Now fix up the structures.</span>
+    coneDichrom = coneTrichrom;
+    coneDichrom = coneSet(coneDichrom,<span class="string">'spatial density'</span>,spatialDensityDichrom);
+    sensorDichrom = sensorSet(sensorDichrom,<span class="string">'human cone'</span>,coneDichrom);
+    sensorDichrom = sensorSet(sensorDichrom,<span class="string">'cone type'</span>,cfaPatternDichrom);
+    cfaCheckDichrom = sensorGet(sensorDichrom,<span class="string">'pattern'</span>);
+    UnitTest.assert(~any(abs(cfaPatternDichrom-cfaCheckDichrom)),<span class="string">'CFA consistency assertion'</span>);
+
+    <span class="comment">% Compute with our dichromatic sensor</span>
+    sensorDichromSpd = sensorCompute(sensorDichrom,oiSpd);
+    sensorDichromSpd = sensorSet(sensorDichromSpd,<span class="string">'name'</span>,<span class="string">'theDichromSpd'</span>);
+    sensorDichromMetamer = sensorCompute(sensorDichrom,oiMetamer);
+    sensorDichromMetamer = sensorSet(sensorDichromMetamer,<span class="string">'name'</span>,<span class="string">'theDichromMetamer'</span>);
+    vcAddAndSelectObject(sensorDichromSpd);
+    vcAddAndSelectObject(sensorDichromMetamer);
+    sensorWindow(<span class="string">'scale'</span>,1);
+    UnitTest.validationData(<span class="string">'sensorDichromSpd'</span>, sensorDichromSpd);
+    UnitTest.validationData(<span class="string">'sensorDichromMetamer'</span>, sensorDichromMetamer);
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_04.png" alt=""> <h2>Check dichromatic sensor response arrays<a name="17"></a></h2><p>If we are living clean, the two sensor response arrays for the dichromatic sensors should match.</p><pre class="codeinput">    photonsTrichromSpd = sensorGet(sensorTrichromSpd,<span class="string">'photons'</span>);
+    photonsTrichromMetamer = sensorGet(sensorTrichromMetamer,<span class="string">'photons'</span>);
+    photonsDichromSpd = sensorGet(sensorDichromSpd,<span class="string">'photons'</span>);
+    photonsDichromMetamer = sensorGet(sensorDichromMetamer,<span class="string">'photons'</span>);
+    checkDiff = photonsDichromSpd-photonsDichromMetamer;
+    UnitTest.assertIsZero(max(abs(checkDiff(:)))/mean([photonsDichromSpd(:) ; photonsDichromMetamer(:)]),<span class="string">'Dichrom metamer difference check'</span>,5e-5);
+</pre><h2>Isetbio cone demosaicing<a name="18"></a></h2><p>That's the way you do, get your money for nothing.</p><pre class="codeinput">    [~,demosaicTrichromSpdLMS] = sensorDemosaicCones(sensorTrichromSpd,<span class="string">'linear'</span>);
+    [~,demosaicTrichromMetamerLMS] = sensorDemosaicCones(sensorTrichromMetamer,<span class="string">'linear'</span>);
+    [~,demosaicDichromSpdLMS] = sensorDemosaicCones(sensorDichromSpd,<span class="string">'linear'</span>);
+    [~,demosaicDichromMetamerLMS] = sensorDemosaicCones(sensorDichromMetamer,<span class="string">'linear'</span>);
+
+    <span class="comment">% Color blindness rendering correction.</span>
+    demosaicDichromSpdLMS = lms2lmsDichromat(demosaicDichromSpdLMS,2,<span class="string">'linear'</span>);
+    demosaicDichromMetamerLMS = lms2lmsDichromat(demosaicDichromMetamerLMS,2,<span class="string">'linear'</span>);
+    UnitTest.validationData(<span class="string">'demosaicDichromSpdLMS'</span>, demosaicDichromSpdLMS);
+    UnitTest.validationData(<span class="string">'demosaicDichromMetamerLMS'</span>, demosaicDichromMetamerLMS);
+
+    <span class="comment">% We need everything rendered into SRGB with a common scale factor.  This</span>
+    <span class="comment">% was chosen by some fussing, and is matched to what we do in</span>
+    <span class="comment">% FigDichromMetam.</span>
+    maxVal = max(demosaicTrichromSpdLMS(:));
+    renderScalar = 0.4;
+    <span class="keyword">for</span> ii = 1:3
+        demosaicTrichromSpdLMS(:,:,ii) = renderScalar*demosaicTrichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicTrichromMetamerLMS(:,:,ii) = renderScalar*demosaicTrichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromSpdLMS(:,:,ii) = renderScalar*demosaicDichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromMetamerLMS(:,:,ii) = renderScalar*demosaicDichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+    <span class="keyword">end</span>
+
+    demosaicTrichromSpdSRGB = lms2srgb(demosaicTrichromSpdLMS);
+    demosaicTrichromMetamerSRGB = lms2srgb(demosaicTrichromMetamerLMS);
+    demosaicDichromSpdSRGB = lms2srgb(demosaicDichromSpdLMS);
+    demosaicDichromMetamerSRGB = lms2srgb(demosaicDichromMetamerLMS);
+    UnitTest.validationData(<span class="string">'demosaicTrichromSpdSRGB'</span>, demosaicTrichromSpdSRGB);
+    UnitTest.validationData(<span class="string">'demosaicTrichromMetamerSRGB'</span>, demosaicTrichromMetamerSRGB);
+    UnitTest.validationData(<span class="string">'demosaicDichromSpdSRGB'</span>, demosaicDichromSpdSRGB);
+    UnitTest.validationData(<span class="string">'demosaicDichromMetamerSRGB'</span>, demosaicDichromMetamerSRGB);
+
+    <span class="comment">% max([demosaicTrichromSpdSRGB(:)' demosaicTrichromMetamerSRGB(:)' demosaicDichromSpdSRGB(:)' demosaicDichromMetamerSRGB(:)'])</span>
+
+    figure; clf;
+    subplot(2,2,1); hold <span class="string">on</span>
+    imshow(demosaicTrichromSpdSRGB);
+    title(<span class="string">'Trichrom Spd'</span>);
+    subplot(2,2,2); hold <span class="string">on</span>
+    imshow(demosaicTrichromMetamerSRGB);
+    title(<span class="string">'Trichrom Metamer'</span>);
+    subplot(2,2,3); hold <span class="string">on</span>
+    imshow(demosaicDichromSpdSRGB);
+    title(<span class="string">'Dichrom Spd'</span>);
+    subplot(2,2,4); hold <span class="string">on</span>
+    imshow(demosaicDichromMetamerSRGB);
+    title(<span class="string">'Dichrom Metamer'</span>);
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_05.png" alt=""> <h2>Create the spatiochromatic metamer<a name="19"></a></h2><p>Now that we've done all this work, we're going to take the photon array from the trichromatic mosaic and process it with the dichromatic mosaic.</p><pre class="codeinput">    sensorDichromWithTrichomSpd = sensorDichromSpd;
+    sensorDichromWithTrichomSpd = sensorSet(sensorDichromWithTrichomSpd,<span class="string">'photons'</span>,photonsTrichromSpd);
+    sensorDicrhomWithTrichromMetamer = sensorDichromMetamer;
+    sensorDichromWithTrichromMetamer = sensorSet(sensorDicrhomWithTrichromMetamer,<span class="string">'photons'</span>,photonsTrichromMetamer);
+    UnitTest.validationData(<span class="string">'sensorDichromWithTrichomSpd'</span>, sensorDichromWithTrichomSpd);
+    UnitTest.validationData(<span class="string">'sensorDichromWithTrichromMetamer'</span>, sensorDichromWithTrichromMetamer);
+</pre><h2>Demosaic to get metamers<a name="20"></a></h2><pre class="codeinput">    [~,demosaicDichromWithTrichromSpdLMS] = sensorDemosaicCones(sensorDichromWithTrichomSpd,<span class="string">'linear'</span>);
+    [~,demosaicDichromWithTrichromMetamerLMS] = sensorDemosaicCones(sensorDichromWithTrichromMetamer,<span class="string">'linear'</span>);
+
+    <span class="comment">% Color blindness rendering correction.</span>
+    demosaicDichromWithTrichromSpdLMS = lms2lmsDichromat(demosaicDichromWithTrichromSpdLMS,2,<span class="string">'linear'</span>);
+    demosaicDichromWithTrichromMetamerLMS = lms2lmsDichromat(demosaicDichromWithTrichromMetamerLMS,2,<span class="string">'linear'</span>);
+    UnitTest.validationData(<span class="string">'demosaicDichromWithTrichromSpdLMS'</span>, demosaicDichromWithTrichromSpdLMS);
+    UnitTest.validationData(<span class="string">'demosaicDichromWithTrichromMetamerLMS'</span>, demosaicDichromWithTrichromMetamerLMS);
+
+    <span class="comment">% We need everything rendered into SRGB with a common scale factor.  This</span>
+    <span class="comment">% was chosen by some fussing, and is matched to what we do in</span>
+    <span class="comment">% FigDichromMetam.</span>
+    <span class="keyword">for</span> ii = 1:3;
+        demosaicDichromWithTrichromSpdLMS(:,:,ii) = renderScalar*demosaicDichromWithTrichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromWithTrichromMetamerLMS(:,:,ii) = renderScalar*demosaicDichromWithTrichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+    <span class="keyword">end</span>
+
+    demosaicDichromWithTrichromSpdSRGB = lms2srgb(demosaicDichromWithTrichromSpdLMS);
+    demosaicDichromWithTrichromMetamerSRGB = lms2srgb(demosaicDichromWithTrichromMetamerLMS);
+    UnitTest.validationData(<span class="string">'demosaicDichromWithTrichromSpdSRGB'</span>, demosaicDichromWithTrichromSpdSRGB);
+    UnitTest.validationData(<span class="string">'demosaicDichromWithTrichromMetamerSRGB'</span>, demosaicDichromWithTrichromMetamerSRGB);
+
+    <span class="comment">%max([demosaicDichromWithTrichromSpdSRGB(:)' demosaicDichromWithTrichromMetamerSRGB(:)']);</span>
+
+    figure; clf;
+    subplot(1,2,1); hold <span class="string">on</span>
+    imshow(demosaicDichromWithTrichromSpdSRGB);
+    title(<span class="string">'Dichrom w Trichrom Spd'</span>);
+    subplot(1,2,2); hold <span class="string">on</span>
+    imshow(demosaicDichromWithTrichromMetamerSRGB);
+    title(<span class="string">'Dichrom w Trichrom Metamer'</span>);
+</pre><img vspace="5" hspace="5" src="FigSpatioChromaticAliasing_06.png" alt=""> <h2>Size of image definitions<a name="21"></a></h2><pre class="codeinput">    sz = size(cfaPatternTrichrom);
+    rowStart = round(sz(1)/2 - figParams.imageExtractPixels/2:sz(1));
+    rowEnd = round(sz(1)/2 + figParams.imageExtractPixels/2:sz(1));
+    colStart = round(sz(2)/2 - figParams.imageExtractPixels/2:sz(1));
+    colEnd = round(sz(2)/2 + figParams.imageExtractPixels/2:sz(1));
+</pre><h2>Make and write mosaic images<a name="22"></a></h2><pre class="codeinput">    [coneMosaicImageTrichrom] = generateConeMosaicImage(cfaPatternTrichrom(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [coneMosaicImageDichrom] = generateConeMosaicImage(cfaPatternDichrom(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    imwrite(coneMosaicImageTrichrom, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConeMosaicTrichrom'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(coneMosaicImageDichrom, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConeMosaicDichrom'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    UnitTest.validationData(<span class="string">'cfaPatternTrichrom'</span>, cfaPatternTrichrom);
+    UnitTest.validationData(<span class="string">'cfaPatternDichrom'</span>, cfaPatternDichrom);
+    UnitTest.validationData(<span class="string">'coneMosaicImageTrichrom'</span>, coneMosaicImageTrichrom);
+    UnitTest.validationData(<span class="string">'coneMosaicImageDichrom'</span>, coneMosaicImageDichrom);
+</pre><h2>Make and write images showing responses<a name="23"></a></h2><pre class="codeinput">    [~,photonsTrichromImageRawSpd] = generateConePhotonsImage(photonsTrichromSpd(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsTrichromImageRawMetamer] = generateConePhotonsImage(photonsTrichromMetamer(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsDichromImageRawSpd] = generateConePhotonsImage(photonsDichromSpd(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsDichromImageRawMetamer] = generateConePhotonsImage(photonsDichromMetamer(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    tempScaleFactor = max([photonsTrichromImageRawSpd(:) ; photonsTrichromImageRawMetamer(:) ; photonsDichromImageRawSpd(:) ; photonsDichromImageRawMetamer(:)]);
+    imwrite(photonsTrichromImageRawSpd/tempScaleFactor, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConePhotonMapTrichromSpd'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(photonsTrichromImageRawMetamer/tempScaleFactor, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConePhotonMapTrichromMetamer'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(photonsDichromImageRawSpd/tempScaleFactor, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConePhotonMapDichromSpd'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(photonsDichromImageRawMetamer/tempScaleFactor, fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'ConePhotonMapDichromMetamer'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+</pre><h2>Write out images for figures<a name="24"></a></h2><pre class="codeinput">    imwrite(Expand(demosaicTrichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicTrichromSpd'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicTrichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicTrichromMetamer'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicDichromSpd'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicDichromMetamer'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+
+    imwrite(Expand(demosaicDichromWithTrichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicDichromWithTrichromSpd'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromWithTrichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), <span class="keyword">...</span>
+        fullfile(outputDir,[mfilename <span class="string">'_'</span> <span class="string">'DemosaicDichromWithTrichromMetamer'</span>  <span class="string">'.'</span> figParams.imType]),figParams.imType);
+</pre><pre class="codeinput"><span class="keyword">catch</span> err
+</pre><h2>Restore warning state<a name="26"></a></h2><pre class="codeinput">    warning(warnS.state,warnS.identifier);
+</pre><h2>Rethrow error<a name="27"></a></h2><pre class="codeinput">    rethrow(err);
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="http://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2014b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function varargout = FigSpatioChromaticAliasing(varargin)
+%
+% Produce a spatiochromatic alias for mosaic responses to a charomatic uniform field.
+%
+% The output of this script isn't currently used in the Annual Review
+% paper, but It might be eventually.  It also produces figures that I may
+% want for my ARVO 2015 talk.
+%
+% Based originally on FigBasicAliasing.
+%
+% 3/23/15   dhb  Wrote it.
+% 4/20/15   dhb  Bring into the validation fold.% 6/29/15 dhb   Fix way we set up coneP to be more robust REPLACE_WITH_DASH_DASH  old less robust code got broken
+%                by some lower level change.
+
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+function ValidationFunction(runTimeParams)
+
+%% Clear, define, etc.
+ieInit;
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+
+%% Supress irritating warnings
+warnS = warning('off','images:initSize:adjustingMag');
+try
+    
+    %% Frozen noise, so that we can validate OK
+    randomSeedValue = 26;
+    rng(randomSeedValue);
+    
+    %% Figure parameters
+    curDir = pwd;
+    masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
+    cd(masterFigParamsDir);
+    figParams = MasterFigParams;
+    cd(curDir);
+    if (exist('../SecondaryFigParams','file'))
+        cd ..
+        figParams = SecondaryFigParams(figParams);
+        cd(curDir);
+    end
+    figParams.resizeScale = 1;
+    UnitTest.validationData('figParams', figParams);
+    
+    %% Compute parameters
+    if (runTimeParams.inStandAloneMode)
+        sceneDegrees = 3;
+        extractDegrees = 1;
+        gratingCpd = 0;
+        SCALESRGBMethod = 1;
+        outputSuffix = sprintf('_%dcpd',gratingCpd);
+        % This branch is executed when you run from a validation script, and
+        % should be left alone so that the parameters at runtime match those used
+        % when the validation data were stored.
+    else
+        sceneDegrees = 3;
+        extractDegrees = 1;
+        gratingCpd = 0;
+        SCALESRGBMethod = 1;
+        outputSuffix = sprintf('_%dcpd',gratingCpd);
+    end
+    
+    %% Set up optical image
+    %
+    % I don't think this code actually turns off the optics at
+    % present.  What looks like it would work is to insert
+    % optics = opticsSet(optics,'model','skip') in place of the
+    % current set of 'otf method'.
+    oi = oiCreate('human');
+    optics = oiGet(oi,'optics');
+    optics = opticsSet(optics,'off axis method','skip');
+    optics = opticsSet(optics,'otf method','skip otf');
+    oi     = oiSet(oi,'optics',optics);
+    
+    %% Set up sensor
+    %
+    % Do this early to get cone spectral sensitivities
+    %
+    % The isetbio cone default is for 200 linear cones per degree in the fovea.
+    % This seems high for the central 1 degree overall, but might be correct
+    % right at the center.  So we adjust via pixel size.
+    coneP = coneCreate('human');
+    coneP = coneSet(coneP,'spatial density',[0.0 0.625 0.325 .05]);
+    sensorTrichrom = sensorCreate('human',[],coneP);
+    sensorTrichrom = sensorSet(sensorTrichrom, 'noise flag', 0);
+    sensorTrichrom = sensorSet(sensorTrichrom,'exp time',2);
+    sensorTrichrom = sensorSet(sensorTrichrom,'rows',128);
+    sensorTrichrom = sensorSet(sensorTrichrom,'cols',128);
+    pixel = sensorGet(sensorTrichrom,'pixel');
+    pixel = pixelSet(pixel,'sizesamefillfactor',(200/120)*[1.5e-6 1.5e-6]);
+    sensorTrichrom = sensorSet(sensorTrichrom,'pixel',pixel);
+    
+    %% Compute a metameric pair
+    %
+    % This follows FigDichromMetam so that what we do here is matched to what
+    % we do there.
+    
+    % Cone sensitivities.  Let's be pros and show unnormalized quantal
+    % sensitivities.  And, use isetbio to generate the data for the plots.
+    wave = sensorGet(sensorTrichrom,'wave');
+    S_in = WlsToS(wave);
+    T_conesQE_in = sensorGet(sensorTrichrom,'spectral qe')';
+    S = S_in;
+    wls = SToWls(S);
+    T_conesQETrichrom = SplineCmf(S_in,T_conesQE_in(2:4,:),S);
+    T_conesQEDichrom = SplineCmf(S_in,T_conesQE_in([2 4],:),S);
+    UnitTest.validationData('S', S);
+    UnitTest.validationData('T_conesQETrichrom', T_conesQETrichrom);
+    UnitTest.validationData('T_conesQEDichrom', T_conesQEDichrom);
+    
+    % Energy sensitivities.  We need these to convert the isomerizations into
+    % the right relative scaling for SRGB rendering.
+    T_conesTrichrom = EnergyToQuanta(S,T_conesQETrichrom')';
+    T_conesTrichrom = T_conesTrichrom/max(T_conesTrichrom(:));
+    for ii = 1:3
+        renderingScaleFactors(ii) = 1/max(T_conesTrichrom(ii,:));
+    end
+    
+    % Color matching functions
+    load('T_xyz1931');
+    T_xyz = SplineCmf(S_xyz1931,T_xyz1931,S);
+    UnitTest.validationData('T_xyz', T_xyz);
+    
+    % Some spectra.  We treat these as in quantal units, though since we never
+    % say in the paper what they are, it doesn't really matter where we got
+    % them.
+    load sur_mccBabel
+    theSpd = SplineSpd(S_mccBabel,...
+        figParams.spectralConstant*ones(size(sur_mccBabel(:,figParams.whichMCCSquare))) + ...
+        figParams.mccSquareScale*sur_mccBabel(:,figParams.whichMCCSquare) + ...
+        figParams.mccSquareScale2*sur_mccBabel(:,figParams.whichMCCSquare2) + ...
+        figParams.mccSquareScale3*sur_mccBabel(:,figParams.whichMCCSquare3),S);
+    theSpd = 1e18*theSpd/max(theSpd(:));
+    theSpdConesDichrom = T_conesQEDichrom*theSpd;
+    theSpdConesTrichrom = T_conesQETrichrom*theSpd;
+    UnitTest.validationData('theSpd', theSpd);
+    UnitTest.validationData('theSpdConesDichrom', theSpdConesDichrom);
+    UnitTest.validationData('theSpdConesTrichrom', theSpdConesTrichrom);
+    
+    % Some monitor primaries
+    load B_monitor
+    B = SplineSpd(S_monitor,B_monitor(:,2:3),S);
+    UnitTest.validationData('B', B);
+    
+    % Compute monitor metamer for spd
+    theMetamer = B*inv(T_conesQEDichrom*B)*T_conesQEDichrom*theSpd;
+    theMetamerConesDichrom = T_conesQEDichrom*theMetamer;
+    theMetamerConesTrichrom = T_conesQETrichrom*theMetamer;
+    UnitTest.validationData('theMetamer', theMetamer);
+    UnitTest.validationData('theMetamerConesDichrom', theMetamerConesDichrom);
+    UnitTest.validationData('theMetamerConesTrichrom', theMetamerConesTrichrom);
+    
+    %% Create the scene
+    %
+    % Spatially uniform field scene
+    parms.freq = round(gratingCpd*sceneDegrees); parms.contrast = 1; parms.ph = 0;
+    parms.ang= 0; parms.row = 600; parms.col = 600; parms.GaborFlag=0;
+    scene = sceneCreate('harmonic',parms);
+    scene = sceneSet(scene,'wave',wave(:));
+    scene = sceneSet(scene,'fov',sceneDegrees);
+    scenePhotonsOriginal = sceneGet(scene,'photons');
+    [mScene,nScene,~] = size(scenePhotonsOriginal);
+    
+    % Create versions with our desired spectra
+    scenePhotonsSpd = zeros(size(scenePhotonsOriginal));
+    scenePhotonsMetamer = zeros(size(scenePhotonsOriginal));
+    for w = 1:length(wave)
+        scenePhotonsSpd(:,:,w) = theSpd(w);
+        scenePhotonsMetamer(:,:,w) = theMetamer(w);
+    end
+    sceneSpd = sceneSet(scene,'photons',scenePhotonsSpd);
+    sceneSpd = sceneSet(sceneSpd,'name','theSpd');
+    sceneMetamer = sceneSet(scene,'photons',scenePhotonsMetamer);
+    sceneMetamer = sceneSet(sceneMetamer,'name','theMetamer');
+    UnitTest.validationData('sceneSpd', sceneSpd);
+    UnitTest.validationData('sceneMetamer', sceneMetamer);
+    
+    %% Look at scenes
+    %
+    % These match up pretty well with what happens in FigDichromMetam.
+    vcAddAndSelectObject(sceneSpd);
+    vcAddAndSelectObject(sceneMetamer); sceneWindow;
+    
+    %% Compute optical images and look at them
+    oiSpd = oiCompute(oi,sceneSpd);
+    oiSpd = oiSet(oiSpd,'name','theSpd');
+    oiMetamer = oiCompute(oi,sceneMetamer);
+    oiMetamer = oiSet(oiMetamer,'name','theMetamer');
+    [mOi,nOi,~] = size(oiGet(oiSpd,'photons'));
+    vcAddAndSelectObject(oiSpd);
+    vcAddAndSelectObject(oiMetamer); oiWindow;
+    UnitTest.validationData('oiSpd', oiSpd);
+    UnitTest.validationData('oiMetamer', oiMetamer);
+    
+    %% Make sensor images
+    [sensorTrichrom, ~] = sensorSetSizeToFOV(sensorTrichrom,sceneDegrees,scene,oi);
+    sensorTrichromSpd = sensorCompute(sensorTrichrom,oiSpd);
+    sensorTrichromSpd = sensorSet(sensorTrichromSpd,'name','theTrichromSpd');
+    sensorTrichromMetamer = sensorCompute(sensorTrichrom,oiMetamer);
+    sensorTrichromMetamer = sensorSet(sensorTrichromMetamer,'name','theTrichromMetamer');
+    vcAddAndSelectObject(sensorTrichromSpd);
+    vcAddAndSelectObject(sensorTrichromMetamer);
+    sensorWindow('scale',1);
+    UnitTest.validationData('sensorTrichromSpd', sensorTrichromSpd);
+    UnitTest.validationData('sensorTrichromMetamer', sensorTrichromMetamer);
+    
+    %% Create dichromatic versions of the same sensor, and compute those images
+    %
+    % Start with the trichromatic version
+    sensorDichrom = sensorTrichrom;
+    
+    % Turn every instance of a 3 in the cfa into a 2.
+    cfaPatternTrichrom = sensorGet(sensorTrichrom,'pattern');
+    cfaCheckTrichrom = sensorGet(sensorTrichrom,'cone type');
+    if (any(abs(cfaPatternTrichrom-cfaCheckTrichrom)))
+        error('CFA inconsistency in trichromatic sensor structure');
+    end
+    cfaPatternDichrom = cfaPatternTrichrom;
+    cfaPatternDichrom(cfaPatternDichrom == 3) = 2;
+    
+    % Adjust the spatial densities to match what we did to the CFA.
+    coneTrichrom = sensorGet(sensorTrichrom,'human cone');
+    spatialDensityTrichrom = coneGet(coneTrichrom,'spatial density');
+    spatialDensityDichrom = spatialDensityTrichrom;
+    spatialDensityDichrom(2) = spatialDensityTrichrom(2)+spatialDensityTrichrom(3);
+    spatialDensityDichrom(3) = 0;
+    
+    % Now fix up the structures.
+    coneDichrom = coneTrichrom;
+    coneDichrom = coneSet(coneDichrom,'spatial density',spatialDensityDichrom);
+    sensorDichrom = sensorSet(sensorDichrom,'human cone',coneDichrom);
+    sensorDichrom = sensorSet(sensorDichrom,'cone type',cfaPatternDichrom);
+    cfaCheckDichrom = sensorGet(sensorDichrom,'pattern');
+    UnitTest.assert(~any(abs(cfaPatternDichrom-cfaCheckDichrom)),'CFA consistency assertion');
+    
+    % Compute with our dichromatic sensor
+    sensorDichromSpd = sensorCompute(sensorDichrom,oiSpd);
+    sensorDichromSpd = sensorSet(sensorDichromSpd,'name','theDichromSpd');
+    sensorDichromMetamer = sensorCompute(sensorDichrom,oiMetamer);
+    sensorDichromMetamer = sensorSet(sensorDichromMetamer,'name','theDichromMetamer');
+    vcAddAndSelectObject(sensorDichromSpd);
+    vcAddAndSelectObject(sensorDichromMetamer);
+    sensorWindow('scale',1);
+    UnitTest.validationData('sensorDichromSpd', sensorDichromSpd);
+    UnitTest.validationData('sensorDichromMetamer', sensorDichromMetamer);
+    
+    %% Check dichromatic sensor response arrays
+    %
+    % If we are living clean, the two sensor response arrays for the
+    % dichromatic sensors should match.
+    photonsTrichromSpd = sensorGet(sensorTrichromSpd,'photons');
+    photonsTrichromMetamer = sensorGet(sensorTrichromMetamer,'photons');
+    photonsDichromSpd = sensorGet(sensorDichromSpd,'photons');
+    photonsDichromMetamer = sensorGet(sensorDichromMetamer,'photons');
+    checkDiff = photonsDichromSpd-photonsDichromMetamer;
+    UnitTest.assertIsZero(max(abs(checkDiff(:)))/mean([photonsDichromSpd(:) ; photonsDichromMetamer(:)]),'Dichrom metamer difference check',5e-5);
+    
+    %% Isetbio cone demosaicing
+    %
+    % That's the way you do, get your money for nothing.
+    [~,demosaicTrichromSpdLMS] = sensorDemosaicCones(sensorTrichromSpd,'linear');
+    [~,demosaicTrichromMetamerLMS] = sensorDemosaicCones(sensorTrichromMetamer,'linear');
+    [~,demosaicDichromSpdLMS] = sensorDemosaicCones(sensorDichromSpd,'linear');
+    [~,demosaicDichromMetamerLMS] = sensorDemosaicCones(sensorDichromMetamer,'linear');
+    
+    % Color blindness rendering correction.
+    demosaicDichromSpdLMS = lms2lmsDichromat(demosaicDichromSpdLMS,2,'linear');
+    demosaicDichromMetamerLMS = lms2lmsDichromat(demosaicDichromMetamerLMS,2,'linear');
+    UnitTest.validationData('demosaicDichromSpdLMS', demosaicDichromSpdLMS);
+    UnitTest.validationData('demosaicDichromMetamerLMS', demosaicDichromMetamerLMS);
+    
+    % We need everything rendered into SRGB with a common scale factor.  This
+    % was chosen by some fussing, and is matched to what we do in
+    % FigDichromMetam.
+    maxVal = max(demosaicTrichromSpdLMS(:));
+    renderScalar = 0.4;
+    for ii = 1:3
+        demosaicTrichromSpdLMS(:,:,ii) = renderScalar*demosaicTrichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicTrichromMetamerLMS(:,:,ii) = renderScalar*demosaicTrichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromSpdLMS(:,:,ii) = renderScalar*demosaicDichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromMetamerLMS(:,:,ii) = renderScalar*demosaicDichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+    end
+    
+    demosaicTrichromSpdSRGB = lms2srgb(demosaicTrichromSpdLMS);
+    demosaicTrichromMetamerSRGB = lms2srgb(demosaicTrichromMetamerLMS);
+    demosaicDichromSpdSRGB = lms2srgb(demosaicDichromSpdLMS);
+    demosaicDichromMetamerSRGB = lms2srgb(demosaicDichromMetamerLMS);
+    UnitTest.validationData('demosaicTrichromSpdSRGB', demosaicTrichromSpdSRGB);
+    UnitTest.validationData('demosaicTrichromMetamerSRGB', demosaicTrichromMetamerSRGB);
+    UnitTest.validationData('demosaicDichromSpdSRGB', demosaicDichromSpdSRGB);
+    UnitTest.validationData('demosaicDichromMetamerSRGB', demosaicDichromMetamerSRGB);
+    
+    % max([demosaicTrichromSpdSRGB(:)' demosaicTrichromMetamerSRGB(:)' demosaicDichromSpdSRGB(:)' demosaicDichromMetamerSRGB(:)'])
+    
+    figure; clf;
+    subplot(2,2,1); hold on
+    imshow(demosaicTrichromSpdSRGB);
+    title('Trichrom Spd');
+    subplot(2,2,2); hold on
+    imshow(demosaicTrichromMetamerSRGB);
+    title('Trichrom Metamer');
+    subplot(2,2,3); hold on
+    imshow(demosaicDichromSpdSRGB);
+    title('Dichrom Spd');
+    subplot(2,2,4); hold on
+    imshow(demosaicDichromMetamerSRGB);
+    title('Dichrom Metamer');
+    
+    %% Create the spatiochromatic metamer
+    %
+    % Now that we've done all this work, we're going to take the photon array from the
+    % trichromatic mosaic and process it with the dichromatic mosaic.
+    sensorDichromWithTrichomSpd = sensorDichromSpd;
+    sensorDichromWithTrichomSpd = sensorSet(sensorDichromWithTrichomSpd,'photons',photonsTrichromSpd);
+    sensorDicrhomWithTrichromMetamer = sensorDichromMetamer;
+    sensorDichromWithTrichromMetamer = sensorSet(sensorDicrhomWithTrichromMetamer,'photons',photonsTrichromMetamer);
+    UnitTest.validationData('sensorDichromWithTrichomSpd', sensorDichromWithTrichomSpd);
+    UnitTest.validationData('sensorDichromWithTrichromMetamer', sensorDichromWithTrichromMetamer);
+    
+    %% Demosaic to get metamers
+    [~,demosaicDichromWithTrichromSpdLMS] = sensorDemosaicCones(sensorDichromWithTrichomSpd,'linear');
+    [~,demosaicDichromWithTrichromMetamerLMS] = sensorDemosaicCones(sensorDichromWithTrichromMetamer,'linear');
+    
+    % Color blindness rendering correction.
+    demosaicDichromWithTrichromSpdLMS = lms2lmsDichromat(demosaicDichromWithTrichromSpdLMS,2,'linear');
+    demosaicDichromWithTrichromMetamerLMS = lms2lmsDichromat(demosaicDichromWithTrichromMetamerLMS,2,'linear');
+    UnitTest.validationData('demosaicDichromWithTrichromSpdLMS', demosaicDichromWithTrichromSpdLMS);
+    UnitTest.validationData('demosaicDichromWithTrichromMetamerLMS', demosaicDichromWithTrichromMetamerLMS);
+    
+    % We need everything rendered into SRGB with a common scale factor.  This
+    % was chosen by some fussing, and is matched to what we do in
+    % FigDichromMetam.
+    for ii = 1:3;
+        demosaicDichromWithTrichromSpdLMS(:,:,ii) = renderScalar*demosaicDichromWithTrichromSpdLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+        demosaicDichromWithTrichromMetamerLMS(:,:,ii) = renderScalar*demosaicDichromWithTrichromMetamerLMS(:,:,ii)*renderingScaleFactors(ii)/maxVal;
+    end
+    
+    demosaicDichromWithTrichromSpdSRGB = lms2srgb(demosaicDichromWithTrichromSpdLMS);
+    demosaicDichromWithTrichromMetamerSRGB = lms2srgb(demosaicDichromWithTrichromMetamerLMS);
+    UnitTest.validationData('demosaicDichromWithTrichromSpdSRGB', demosaicDichromWithTrichromSpdSRGB);
+    UnitTest.validationData('demosaicDichromWithTrichromMetamerSRGB', demosaicDichromWithTrichromMetamerSRGB);
+    
+    %max([demosaicDichromWithTrichromSpdSRGB(:)' demosaicDichromWithTrichromMetamerSRGB(:)']);
+    
+    figure; clf;
+    subplot(1,2,1); hold on
+    imshow(demosaicDichromWithTrichromSpdSRGB);
+    title('Dichrom w Trichrom Spd');
+    subplot(1,2,2); hold on
+    imshow(demosaicDichromWithTrichromMetamerSRGB);
+    title('Dichrom w Trichrom Metamer');
+    
+    %% Size of image definitions
+    sz = size(cfaPatternTrichrom);
+    rowStart = round(sz(1)/2 - figParams.imageExtractPixels/2:sz(1));
+    rowEnd = round(sz(1)/2 + figParams.imageExtractPixels/2:sz(1));
+    colStart = round(sz(2)/2 - figParams.imageExtractPixels/2:sz(1));
+    colEnd = round(sz(2)/2 + figParams.imageExtractPixels/2:sz(1));
+    
+    %% Make and write mosaic images
+    [coneMosaicImageTrichrom] = generateConeMosaicImage(cfaPatternTrichrom(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [coneMosaicImageDichrom] = generateConeMosaicImage(cfaPatternDichrom(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    imwrite(coneMosaicImageTrichrom, fullfile(outputDir,[mfilename '_' 'ConeMosaicTrichrom'  '.' figParams.imType]),figParams.imType);
+    imwrite(coneMosaicImageDichrom, fullfile(outputDir,[mfilename '_' 'ConeMosaicDichrom'  '.' figParams.imType]),figParams.imType);
+    UnitTest.validationData('cfaPatternTrichrom', cfaPatternTrichrom);
+    UnitTest.validationData('cfaPatternDichrom', cfaPatternDichrom);
+    UnitTest.validationData('coneMosaicImageTrichrom', coneMosaicImageTrichrom);
+    UnitTest.validationData('coneMosaicImageDichrom', coneMosaicImageDichrom);
+    
+    %% Make and write images showing responses
+    [~,photonsTrichromImageRawSpd] = generateConePhotonsImage(photonsTrichromSpd(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsTrichromImageRawMetamer] = generateConePhotonsImage(photonsTrichromMetamer(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsDichromImageRawSpd] = generateConePhotonsImage(photonsDichromSpd(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    [~,photonsDichromImageRawMetamer] = generateConePhotonsImage(photonsDichromMetamer(rowStart:rowEnd,colStart:colEnd), figParams.imageRepFactor, figParams.mosaicImageSytle);
+    tempScaleFactor = max([photonsTrichromImageRawSpd(:) ; photonsTrichromImageRawMetamer(:) ; photonsDichromImageRawSpd(:) ; photonsDichromImageRawMetamer(:)]);
+    imwrite(photonsTrichromImageRawSpd/tempScaleFactor, fullfile(outputDir,[mfilename '_' 'ConePhotonMapTrichromSpd'  '.' figParams.imType]),figParams.imType);
+    imwrite(photonsTrichromImageRawMetamer/tempScaleFactor, fullfile(outputDir,[mfilename '_' 'ConePhotonMapTrichromMetamer'  '.' figParams.imType]),figParams.imType);
+    imwrite(photonsDichromImageRawSpd/tempScaleFactor, fullfile(outputDir,[mfilename '_' 'ConePhotonMapDichromSpd'  '.' figParams.imType]),figParams.imType);
+    imwrite(photonsDichromImageRawMetamer/tempScaleFactor, fullfile(outputDir,[mfilename '_' 'ConePhotonMapDichromMetamer'  '.' figParams.imType]),figParams.imType);
+    
+    %% Write out images for figures
+    imwrite(Expand(demosaicTrichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicTrichromSpd'  '.' figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicTrichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicTrichromMetamer'  '.' figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicDichromSpd'  '.' figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicDichromMetamer'  '.' figParams.imType]),figParams.imType);
+    
+    imwrite(Expand(demosaicDichromWithTrichromSpdSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicDichromWithTrichromSpd'  '.' figParams.imType]),figParams.imType);
+    imwrite(Expand(demosaicDichromWithTrichromMetamerSRGB(rowStart:rowEnd,colStart:colEnd,:),figParams.imageRepFactor), ...
+        fullfile(outputDir,[mfilename '_' 'DemosaicDichromWithTrichromMetamer'  '.' figParams.imType]),figParams.imType);
+    
+catch err
+    %% Restore warning state
+    warning(warnS.state,warnS.identifier);
+    
+    %% Rethrow error
+    rethrow(err);
+end
+
+end
+
+
+##### SOURCE END #####
+--></body></html>
