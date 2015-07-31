@@ -1,4 +1,4 @@
-function vScriptsList = ListBrainardFigsScripts
+function vScriptsList = bfValidateListAllValidationDirs
 % ListBrainardFigsScripts
 %
 % List the script directories to be validated.

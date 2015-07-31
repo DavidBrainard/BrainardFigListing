@@ -9,10 +9,10 @@
 % To adapt this file to your own project, replace 'theProject', with your project's name
 % and similarly for any other fields where 'theProject' appears
 
-function unitTestPreferencesBrainardFigs
+function bfUnitTestPreferences
 
     % Specify root directory
-    theProjectRootDir = '/Users/dhb/Dropbox/xBrainardFigs';
+    theProjectRootDir = '/Users/Shared/Matlab/Analysis/BrainardFigListings';
     
     % I (Nicolas) added the following 4 lines for debugging purposes
     userName =  char(java.lang.System.getProperty('user.name'));
@@ -22,14 +22,15 @@ function unitTestPreferencesBrainardFigs
     
     % Specify project-specific preferences
     p = struct(...
-            'projectName',           'BrainardFigs', ...                                                                                    % The project's name (also the preferences group name)
+            'projectName',           'bfScripts', ...                                                                                       % The project's name (also the preferences group name)
             'validationRootDir',     fullfile(theProjectRootDir), ...                                                                       % Directory location where the 'scripts' subdirectory resides.
             'alternateFastDataDir',  '',  ...                                                                                               % Alternate FAST (hash) data directory location. Specify '' to use the default location, i.e., $validationRootDir/data/fast
-            'alternateFullDataDir',  '', ...                                                                                                % Alternate FULL data directory location. Specify '' to use the default location, i.e., $validationRootDir/data/full
-            'clonedWikiLocation',    '', ...                                                                                                % Local path to the directory where the wiki is cloned. Only relevant for publishing tutorials.
-            'clonedGhPagesLocation', '', ...                                                                                                % Local path to the directory where the gh-pages repository is cloned. Only relevant for publishing tutorials.
-            'githubRepoURL',         '', ...                                                                                                % Github URL for the project. This is only used for publishing tutorials.
+            'alternateFullDataDir',  '/Volumes/Users1/Shared/Matlab/Analysis/BrainardFigListings/data/full', ...                            % Alternate FULL data directory location. Specify '' to use the default location, i.e., $validationRootDir/data/full
+            'clonedWikiLocation',    '/Users/Shared/GitWebSites/BrainardFigListings.wiki', ...                                             % Local path to the directory where the wiki is cloned. Only relevant for publishing tutorials.
+            'clonedGhPagesLocation', '/Users/Shared/GitWebSites/BrainardFigListings/BrainardFigListings', ...                               % Local path to the directory where the gh-pages repository is cloned. Only relevant for publishing tutorials.
+            'githubRepoURL',         'https://github.com/DavidBrainard/BrainardFigListings', ...                                            % Github URL for the project. This is only used for publishing tutorials.
             'generateGroundTruthDataIfNotFound', true, ...                                                                                  % Flag indicating whether to generate ground truth if one is not found
+            'listingScript',         'bfValidateListAllValidationDirs', ...                                                                  % Routine that lists validation dirs
             'masterFigParamsDir',    fullfile(theProjectRootDir,'figparams') ...                                                            % Specific for this project.
         );
 

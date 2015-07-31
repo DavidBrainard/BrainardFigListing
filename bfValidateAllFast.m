@@ -1,14 +1,13 @@
-function validateAllFullBrainardFigs
+function bfValidateAllFast
 
     % Use preferences for the 'theProject' project
-    UnitTest.usePreferencesForProject('BrainardFigs', 'reset');
+    UnitTest.usePreferencesForProject('bfScripts', 'reset');
 
     %% Change some preferences:
     %% Run time error behavior
     % valid options are: 'rethrowExceptionAndAbort', 'catchExceptionAndContinue'
-    %UnitTest.setPref('onRunTimeErrorBehavior', 'catchExceptionAndContinue');
-    UnitTest.setPref('onRunTimeErrorBehavior', 'rethrowExceptionAndAbort');
-
+    UnitTest.setPref('onRunTimeErrorBehavior', 'catchExceptionAndContinue');
+    
     %% Plot generation
     UnitTest.setPref('generatePlots',  false); 
     UnitTest.setPref('closeFigsOnInit', true);
@@ -33,13 +32,9 @@ function validateAllFullBrainardFigs
         % with a validation script directory and an optional struct with
         % prefs that override the corresponding project's prefs.
         % At the moment only the 'generatePlots' pref can be overriden.
-        
-        % Get the validation rootDir
-        rootDir = UnitTest.getPref('validationRootDir');
 
         % List of script directories to validate
-        vScriptsList = listBrainardFigsScripts;
-        
+        vScriptsList = bfValidateListAllValidationDirs;
     else
         % Alternatively, you can provide a list of scripts to validate. 
         % In this case each entry contains a cell array with 
@@ -51,8 +46,9 @@ function validateAllFullBrainardFigs
         rootDir = UnitTest.getPref('validationRootDir');
         
         vScriptsList = {...
-                {fullfile(rootDir, 'scripts', 'AnnReviewColor2015', '2_ConePlanes')} ... 
-            };
+           % {fullfile(rootDir, 'scripts', 'color', 'v_stockman2xyz.m')}
+           % {fullfile(rootDir, 'scripts', 'codedevscripts', 'v_skeleton.m'), struct('generatePlots', true) }
+        };
     end
     
     %% How to validate. Uncomment one of the following five options
@@ -61,10 +57,10 @@ function validateAllFullBrainardFigs
     % UnitTest.runValidationSession(vScriptsList, 'RUN_TIME_ERRORS_ONLY')
     
     % Run a FAST validation session (comparing SHA-256 hash keys of the data)
-    %UnitTest.runValidationSession(vScriptsList, 'FAST');
+    UnitTest.runValidationSession(vScriptsList, 'FAST');
     
     % Run a FULL validation session (comparing actual data)
-    UnitTest.runValidationSession(vScriptsList, 'FULL');
+    %UnitTest.runValidationSession(vScriptsList, 'FULL');
     
     % Run a PUBLISH validation session (comparing actual data and update github wiki)
     % UnitTest.runValidationSession(vScriptsList, 'PUBLISH);

@@ -27,7 +27,7 @@ rng(randomSeedValue);
 
 %% Figure parameters
 curDir = pwd;
-masterFigParamsDir = getpref('BrainardFigs','masterFigParamsDir');
+masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
 cd(masterFigParamsDir);
 figParams = MasterFigParams;
 cd(curDir);
