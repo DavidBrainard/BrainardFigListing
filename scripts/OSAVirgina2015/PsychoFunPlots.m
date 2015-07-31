@@ -1,4 +1,4 @@
-% PsychoFunPlots
+function varargout = PsychoFunPlot(varargin)
 %
 % Plot psychometric functions from illumination discrim data.
 %
@@ -6,12 +6,18 @@
 %
 % 6/2/15  ar, dhb  Created.
 
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+function ValidationFunction(runTimeParams)
+
+
 %% Clear and close
 clear; close all;
 
 %% Figure parameters
 curDir = pwd;
-masterFigParamsDir = getpref('BrainardFigs','masterFigParamsDir');
+masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
 cd(masterFigParamsDir);
 figParams = MasterFigParams;
 cd(curDir);
@@ -81,4 +87,6 @@ figParams.figName = 'PsychometricFunctionExampleWithThresh';
 plot([0 threshPalStair],[criterionCorr criterionCorr],'r','LineWidth',figParams.lineWidth);
 plot([threshPalStair threshPalStair],[0 criterionCorr],'r','LineWidth',figParams.lineWidth);
 FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+
+end
 

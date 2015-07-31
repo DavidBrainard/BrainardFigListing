@@ -1,12 +1,32 @@
-% IllumDiscrimPlots
+function varargout = IllumDiscrimPlots(varargin)
+%
+% Plots of the psychophysical data.
 %
 % This is code provided by Ana and then modified by me,
 % mostly for formatting and to add model predictions.
 %
+% The modeling was in progress at the time of the talk, and
+% to make the model code run you also need the model output.
+% All in all, this is unlikely to be of general interest.
+%
+% A conceptual problem is that by linking to the model data,
+% as we tune the model we no longer get the plots made at the
+% time of the talk.  That doesn't seem pressing enough to fix
+% right now, I'm just noting it.
+%
 % 6/2/15  dhb  Added formatting, started to clean up.
+% 7/31/15 dhb  Added more comments about the fragile nature of life.
+
+varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
+end
+
+function ValidationFunction(runTimeParams)
 
 %% Clear and close
 clear; close all;
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
 
 %% Load the data.  
 % The individual subject data is for the VSS poster data.
@@ -36,7 +56,7 @@ blueIlluminantPsychoNeutral = load(dataFilePath);
 
 %% Figure parameters
 curDir = pwd;
-masterFigParamsDir = getpref('BrainardFigs','masterFigParamsDir');
+masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
 cd(masterFigParamsDir);
 figParams = MasterFigParams;
 cd(curDir);
@@ -233,4 +253,6 @@ if (ALL_BACKGROUNDS)
     %axis('square');
     %set(gca,'XMinorTick','on');
     FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+end
+
 end
