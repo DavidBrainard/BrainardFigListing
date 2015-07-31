@@ -21,6 +21,14 @@ function ValidationFunction(runTimeParams)
 %% Clear
 ieInit;
 
+
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+
 %% Figure parameters
 curDir = pwd;
 masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
@@ -122,7 +130,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 % and just to the first light (for explanatory purposes)
 figParams.figName = 'FigTrichromHistoTrichomMetamersOne';
@@ -141,7 +149,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 % and just L cone response to first light  (again, for explanatory purposes)
 figParams.figName = 'FigTrichromHistoTrichomMetamersOneLOnly';
@@ -158,7 +166,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 %% Make the cone sensitivity figure
 figParams.figName = 'FigTrichromCones';
@@ -187,7 +195,7 @@ set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
 %set(gca,'XMinorTick','on');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 % and an anomalous version for explanatory purposes
 figParams.figName = 'FigTrichromAnomCones';
@@ -216,7 +224,7 @@ set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' M'' cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
 %set(gca,'XMinorTick','on');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 % and an tetrachomatic version for explanatory purposes
 figParams.figName = 'FigTetraCones';
@@ -246,7 +254,7 @@ set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' M'' cones ' ' M cones ' 'S cones'},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
 %set(gca,'XMinorTick','on');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 %% Make the metamer figure
 figParams.figName = 'FigTrichromMetam';
@@ -273,7 +281,7 @@ set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 axis('square');
 %set(gca,'XMinorTick','on');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 % and a version with just the first spectrum
 figParams.figName = 'FigTrichromMetamOne';
@@ -299,7 +307,7 @@ set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 axis('square');
 %set(gca,'XMinorTick','on');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 end
 

@@ -24,6 +24,13 @@ function ValidationFunction(runTimeParams)
 %% Clear, define, etc.
 ieInit;
 
+%% Hello
+UnitTest.validationRecord('SIMPLE_MESSAGE', sprintf('%s',mfilename));
+outputDir = sprintf('%s_Output',mfilename);
+if (~exist(outputDir,'dir'))
+    mkdir(outputDir);
+end
+
 %% Figure parameters
 curDir = pwd;
 masterFigParamsDir = getpref('bfScripts','masterFigParamsDir');
@@ -172,7 +179,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 %% Make a bar plot of dichromatic cone responses to the two lights
 figParams.figName = 'FigDichromHistoDichromMetamers';
@@ -192,7 +199,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 % and just to the first light for exaplanatory purposes
 figParams.figName = 'FigDichromHistoDichromMetamersOne';
@@ -210,7 +217,7 @@ ylim([0 1]);
 set(gca,'YTick',[0 0.5 1]);
 set(gca,'YTickLabel',{' 0.00 ', ' 0.50 ', ' 1.00 '},'FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('Isomerization Rate (arbitrary units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-FigureSave(fullfile(figParams.figName),gcf,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),gcf,figParams.figType);
 
 %% Make the dichromatic cone sensitivity figure
 figParams.figName = 'FigDichromCones';
@@ -237,7 +244,7 @@ set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 figParams.figName = 'FigLConeOnlyCones';
 figParams.xLimLow = 380;
@@ -262,7 +269,7 @@ set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 %% Make the metamer figure
 figParams.figName = 'FigMetamDichrom';
@@ -288,7 +295,7 @@ ylabel('Power (arbitrary quantal units)','FontName',figParams.fontName,'FontSize
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 axis('square');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 % and just the second light for explanatory purposes
 figParams.figName = 'FigMetamDichromTwo';
@@ -313,6 +320,6 @@ ylabel('Power (arbitrary quantal units)','FontName',figParams.fontName,'FontSize
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 axis('square');
-FigureSave(fullfile(figParams.figName),theFig,figParams.figType);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 end

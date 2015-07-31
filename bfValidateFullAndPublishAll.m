@@ -28,7 +28,7 @@ UnitTest.setPref('numericTolerance', 500*eps);
 %% Whether to plot data that do not agree with the ground truth
 UnitTest.setPref('graphMismatchedData', false);
 
-%% Print current values of isetbioValidation prefs
+%% Print current values of isetbioValidation prefsclose
 UnitTest.listPrefs();
 
 %% What to validate
