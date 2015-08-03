@@ -1,1 +1,1 @@
-Figures related to Brainard’s talk at 2015 OSA Image Science and Technology Symposium.  Work was in progress, and these are not likely to be of general interest.
+Figures related to Brainard’s talk at 2015 OSA Image Science and Technology Symposium.  Modeling work was in progress when this talk was given, and these are not likely to be of general longterm interest. In addition, they may run differently now than they did at the time of the talk, as the model details change.
