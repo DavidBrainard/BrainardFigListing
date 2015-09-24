@@ -103,7 +103,8 @@ B = SplineSpd(S_monitor,B_monitor,S);
 UnitTest.validationData('B', B);
 
 % Compute monitor metamer for spd
-theMetamer = B*inv(T_conesQETrichrom*B)*T_conesQETrichrom*theSpd;
+weights = inv(T_conesQETrichrom*B)*T_conesQETrichrom*theSpd;
+theMetamer = B*weights;
 theMetamerCones = T_conesQETrichrom*theMetamer;
 UnitTest.validationData('theMetamer', theMetamer);
 UnitTest.validationData('theMetamerCones', theMetamerCones);
@@ -282,6 +283,32 @@ axis('square');
 %set(gca,'XMinorTick','on');
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
+% a version with just the mixture
+figParams.figName = 'FigTrichromMetamTwo';
+figParams.xLimLow = 380;
+figParams.xLimHigh = 720;
+figParams.xTicks = [400 500 600 700];
+figParams.xTickLabels = {'400' '500' '600' '700'};
+figParams.yLimLow = -0.01;
+figParams.yLimHigh = 1.01;
+figParams.yTicks = [0.0 0.25 0.5 0.75 1.0];
+figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 ' ' 0.75 ' ' 1.00 '};
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+plot(wls,theMetamer,'k:','LineWidth',figParams.lineWidth);
+xlim([figParams.xLimLow figParams.xLimHigh]);
+set(gca,'XTick',figParams.xTicks);
+set(gca,'XTickLabel',figParams.xTickLabels);
+xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylim([figParams.yLimLow figParams.yLimHigh]);
+ylabel('Power (arbitrary quantal units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+set(gca,'YTick',figParams.yTicks);
+set(gca,'YTickLabel',figParams.yTickLabels);
+axis('square');
+%set(gca,'XMinorTick','on');
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+
 % and a version with just the first spectrum
 figParams.figName = 'FigTrichromMetamOne';
 figParams.xLimLow = 380;
@@ -296,6 +323,34 @@ theFig = figure; clf; hold on
 set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
 plot(wls,theSpd,'k','LineWidth',figParams.lineWidth);
+xlim([figParams.xLimLow figParams.xLimHigh]);
+set(gca,'XTick',figParams.xTicks);
+set(gca,'XTickLabel',figParams.xTickLabels);
+xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylim([figParams.yLimLow figParams.yLimHigh]);
+ylabel('Power (arbitrary quantal units)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+set(gca,'YTick',figParams.yTicks);
+set(gca,'YTickLabel',figParams.yTickLabels);
+axis('square');
+%set(gca,'XMinorTick','on');
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+
+% a version with metamer components as r, g, and b
+figParams.figName = 'FigTrichromMetamComponents';
+figParams.xLimLow = 380;
+figParams.xLimHigh = 720;
+figParams.xTicks = [400 500 600 700];
+figParams.xTickLabels = {'400' '500' '600' '700'};
+figParams.yLimLow = -0.01;
+figParams.yLimHigh = 1.01;
+figParams.yTicks = [0.0 0.25 0.5 0.75 1.0];
+figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 ' ' 0.75 ' ' 1.00 '};
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+plot(wls,B(:,1)*weights(1)/(max(B(:,1)*weights(1))),'r','LineWidth',figParams.lineWidth);
+plot(wls,0.5*B(:,2)*weights(2)/(max(B(:,2)*weights(2))),'g','LineWidth',figParams.lineWidth);
+plot(wls,0.5*B(:,3)*weights(3)/(max(B(:,3)*weights(3))),'b','LineWidth',figParams.lineWidth);
 xlim([figParams.xLimLow figParams.xLimHigh]);
 set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
