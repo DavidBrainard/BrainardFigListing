@@ -9,7 +9,8 @@ function varargout = FigSpatioChromaticAliasing(varargin)
 % Based originally on FigBasicAliasing.
 %
 % 3/23/15   dhb  Wrote it.
-% 4/20/15   dhb  Bring into the validation fold.% 6/29/15 dhb   Fix way we set up coneP to be more robust --  old less robust code got broken
+% 4/20/15   dhb  Bring into the validation fold.
+% 6/29/15 dhb   Fix way we set up coneP to be more robust --  old less robust code got broken
 %                by some lower level change.
 
 varargout = UnitTest.runValidationRun(@ValidationFunction, nargout, varargin);
