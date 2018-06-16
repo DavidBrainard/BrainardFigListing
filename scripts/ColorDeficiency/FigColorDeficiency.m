@@ -11,6 +11,20 @@ function varargout = FigColorDeficiency(varargin)
 %% Clear
 ieInit;
 
+%% Parameters
+
+% Anomolous lambda-max
+%anomLambdaMax = [560 559 420.7]';
+anomLambdaMax = [540 530 420.7]';
+
+% Hue circle parameters
+munsellValue = 6;
+munsellChroma = 5;
+nHues = 60;
+
+% How l, s and Lum are weighted in distance calc
+lsLumWeights = [1 0.70 0.08];
+
 %% Hello
 mfiledir = fileparts(mfilename('fullpath'));
 curDir = pwd;
@@ -47,8 +61,7 @@ T_conesQETrichrom = [ptbPhotoreceptorsTrichrom.isomerizationAbsorptance(1,:) ; p
 ptbPhotoreceptorsAnom = DefaultPhotoreceptors('CIE2Deg');
 ptbPhotoreceptorsAnom.nomogram.S = S;
 ptbPhotoreceptorsAnom.nomogram.source = 'StockmanSharpe';
-ptbPhotoreceptorsAnom.nomogram.lambdaMax = [560 557 420.7]';
-%ptbPhotoreceptorsAnom.nomogram.lambdaMax = [534 530 420.7]';
+ptbPhotoreceptorsAnom.nomogram.lambdaMax = anomLambdaMax;
 ptbPhotoreceptorsAnom = rmfield(ptbPhotoreceptorsAnom,'absorbance');
 ptbPhotoreceptorsAnom = FillInPhotoreceptors(ptbPhotoreceptorsAnom);
 T_conesQEAnom = [ptbPhotoreceptorsAnom.isomerizationAbsorptance(1,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(2,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(3,:)];
@@ -64,9 +77,6 @@ for ii = 1:3
 end
 
 % Generate hues around a hue circle
-munsellValue = 6;
-munsellChroma = 5;
-nHues = 45;
 hueAngles = linspace(0,360,nHues+1);
 hueAngles = hueAngles(1:end-1);
 munsellData = MunsellPreprocessTable;
@@ -194,7 +204,6 @@ hueCircle_RGBAnom = double(SRGBGammaCorrect(XYZToSRGBPrimary(hueCircle_XYZAnom))
 % Compute dissimilarity matrix. Start with interpoint distances.
 stimulusDistances_Trichrom = zeros(nHues,nHues);
 stimulusDistances_Anom = zeros(nHues,nHues);
-lsLumWeights = [1 1 0];
 for i = 1:nHues
     for j = 1:nHues
          stimulusDistances_Trichrom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLTrichrom(:,i)-hueCircle_DKLTrichrom(:,j)));
@@ -230,8 +239,8 @@ end
 xlim([0.60 0.75]); ylim([0 0.2]);
 set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
 set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
-xlabel('l chrom','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylabel('s chrom','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
 axis('square');
 
@@ -250,8 +259,8 @@ end
 xlim([0.60 0.75]); ylim([0 0.2]);
 set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
 set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
-xlabel('l chrom','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylabel('s chrom','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
 axis('square');
 figParams.figName = sprintf('LS_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues);
