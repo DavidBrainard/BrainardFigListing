@@ -1,6 +1,10 @@
 function varargout = FigColorDeficiency(varargin)
+% Illustrate confusions produced by color deficiency before/after "treatment"
 %
-% Show confusions produced by color deficiency before/after "treatment"
+% Description:
+%    Generate a Munsell hue circle (a la D100 test) and then use an
+%    opponent space similarity measure to predict confusions.  Show how
+%    these vary as a function of L and M spectral sensitivities.
 %
 % 6/13/17   dhb  Wrote it
 
@@ -14,8 +18,8 @@ ieInit;
 %% Parameters
 
 % Anomolous lambda-max
-%anomLambdaMax = [560 559 420.7]';
-anomLambdaMax = [540 530 420.7]';
+anomLambdaMax = [560 559 420.7]';
+%anomLambdaMax = [540 530 420.7]';
 
 % Hue circle parameters
 munsellValue = 6;
@@ -46,8 +50,7 @@ if (exist('../SecondaryFigParams','file'))
     cd(curDir);
 end
 
-%% Cone sensitivities.
-%
+%% Normal trichromatic cone sensitivities.
 S = [380 4 101]; wls = SToWls(S);
 ptbPhotoreceptorsTrichrom = DefaultPhotoreceptors('CIE2Deg');
 ptbPhotoreceptorsTrichrom.nomogram.S = S;
@@ -66,15 +69,13 @@ ptbPhotoreceptorsAnom = rmfield(ptbPhotoreceptorsAnom,'absorbance');
 ptbPhotoreceptorsAnom = FillInPhotoreceptors(ptbPhotoreceptorsAnom);
 T_conesQEAnom = [ptbPhotoreceptorsAnom.isomerizationAbsorptance(1,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(2,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(3,:)];
 
-% Energy sensitivities.  We need these to convert the isomerizations
-% into the right relative scaling for SRGB rendering.
+%% Energy sensitivities.
+%
+% We need these to actually work with our energy unit inputs.
 T_conesTrichrom = EnergyToQuanta(S,T_conesQETrichrom')';
 T_conesTrichrom = T_conesTrichrom/max(T_conesTrichrom(:));
 T_conesAnom = EnergyToQuanta(S,T_conesQEAnom')';
 T_conesAnom = T_conesAnom/max(T_conesAnom(:));
-for ii = 1:3
-    renderingScaleFactors(ii) = 1/max(T_conesTrichrom(ii,:));
-end
 
 % Generate hues around a hue circle
 hueAngles = linspace(0,360,nHues+1);
@@ -105,14 +106,14 @@ M_wgtsToXYZ = T_xyz*diag(spd_CIEC)*B_sur;
 M_XYZToSur = B_sur*inv(M_wgtsToXYZ);
 hueCircle_sur = M_XYZToSur*hueCircle_XYZ;
 
-%% Estimates from cones
+%% Estimates from normal cones to surface reflectance
 M_wgtsToLMSTrichrom = T_conesTrichrom*diag(spd_CIEC)*B_sur;
 M_LMSTrichromToSur = B_sur*inv(M_wgtsToLMSTrichrom);
-M_wgtsToLMSAnom = T_conesAnom*diag(spd_CIEC)*B_sur;
-M_LMSAnomToSur = B_sur*inv(M_wgtsToLMSAnom);
 
-%% Conversions from cone to CIE XYZ.  This
-% isn't exact because we build the 
+%% Conversions from cone to CIE XYZ.
+%
+% This isn't exact because we're using nomogram-based cone
+% fundamentals.
 load T_xyzCIEPhys2
 T_xyzPhys = SplineCmf(S_xyzCIEPhys2,T_xyzCIEPhys2,S);
 M_ConesTrichromToXYZ = ((T_conesTrichrom')\(T_xyzPhys'))';
@@ -144,6 +145,114 @@ hueCircle_DKLAnom = [hueCircle_lsAnom ; hueCircle_LumAnom];
 hueCircle_XYZAnom = M_ConesTrichromToXYZ*hueCircle_LMSAnom;
 hueCircle_LabAnom = XYZToLab(hueCircle_XYZAnom,white_XYZ);
 hueCircle_RGBAnom = double(SRGBGammaCorrect(XYZToSRGBPrimary(hueCircle_XYZAnom)))/255;
+
+%% Stimulus distances in weighted DKL
+%
+% Compute dissimilarity matrix. Start with interpoint distances.
+stimulusDistances_Trichrom = zeros(nHues,nHues);
+stimulusDistances_Anom = zeros(nHues,nHues);
+for i = 1:nHues
+    for j = 1:nHues
+         stimulusDistances_Trichrom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLTrichrom(:,i)-hueCircle_DKLTrichrom(:,j)));
+         stimulusDistances_Anom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLAnom(:,i)-hueCircle_DKLAnom(:,j)));
+    end
+end
+
+%% LS plane plot of hue circle, with lines to closet neighbors for anom cones.
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 1100 650]);
+markerSize = 8;
+subplot(1,2,1); hold on
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+for hh = 1:nHues
+    [~,index] = sort(stimulusDistances_Anom(hh,:));
+    closestIndex = index(2);
+    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2);
+    closestIndex = index(3);
+    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2); 
+end
+for hh = 1:nHues
+    plot(hueCircle_lsTrichrom(1,hh),hueCircle_lsTrichrom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
+end
+xlim([0.60 0.75]); ylim([0 0.2]);
+set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
+set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
+xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
+axis('square');
+
+subplot(1,2,2); hold on
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+for hh = 1:nHues
+    plot(hueCircle_lsAnom(1,hh),hueCircle_lsAnom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
+end
+xlim([0.60 0.75]); ylim([0 0.2]);
+set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
+set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
+xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
+axis('square');
+figParams.figName = sprintf('LS_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues);
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+
+%% Make the cone sensitivity figure
+figParams.figName = 'FigTrichromCones';
+figParams.xLimLow = 380;
+figParams.xLimHigh = 720;
+figParams.xTicks = [400 500 600 700];
+figParams.xTickLabels = {'400' '500' '600' '700'};
+figParams.yLimLow = -0.01;
+figParams.yLimHigh = 0.51;
+figParams.yTicks = [0.0 0.25 0.5];
+figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
+figParams.lineWidth = 5;
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+plot(wls,T_conesQETrichrom(1,:)','r','LineWidth',figParams.lineWidth);
+plot(wls,T_conesQETrichrom(2,:)','g','LineWidth',figParams.lineWidth);
+plot(wls,T_conesQETrichrom(3,:)','b','LineWidth',figParams.lineWidth);
+xlim([figParams.xLimLow figParams.xLimHigh]);
+set(gca,'XTick',figParams.xTicks);
+set(gca,'XTickLabel',figParams.xTickLabels);
+xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylim([figParams.yLimLow figParams.yLimHigh]);
+ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+set(gca,'YTick',figParams.yTicks);
+set(gca,'YTickLabel',figParams.yTickLabels);
+legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
+axis('square');
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+
+%% And an anomalous version for explanatory purposes
+figParams.figName = 'FigTrichromAnomCones';
+figParams.xLimLow = 380;
+figParams.xLimHigh = 720;
+figParams.xTicks = [400 500 600 700];
+figParams.xTickLabels = {'400' '500' '600' '700'};
+figParams.yLimLow = -0.01;
+figParams.yLimHigh = 0.51;
+figParams.yTicks = [0.0 0.25 0.5];
+figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+plot(wls,T_conesQEAnom(1,:)','r','LineWidth',figParams.lineWidth);
+plot(wls,T_conesQEAnom(2,:)','y','LineWidth',figParams.lineWidth);
+plot(wls,T_conesQEAnom(3,:)','b','LineWidth',figParams.lineWidth);
+xlim([figParams.xLimLow figParams.xLimHigh]);
+set(gca,'XTick',figParams.xTicks);
+set(gca,'XTickLabel',figParams.xTickLabels);
+xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylim([figParams.yLimLow figParams.yLimHigh]);
+ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+set(gca,'YTick',figParams.yTicks);
+set(gca,'YTickLabel',figParams.yTickLabels);
+legend({' L cones ' ' M'' cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
+axis('square');
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 % %% 3D plots in DKL
 % figure; clf; hold on
@@ -177,199 +286,6 @@ hueCircle_RGBAnom = double(SRGBGammaCorrect(XYZToSRGBPrimary(hueCircle_XYZAnom))
 % end
 % xlabel('L'); ylabel('M'); zlabel('S');
 % title('Anomolous LMS');
-
-% %% LS plane plot of hue circle
-% figure; clf; hold on
-% markerSize = 8;
-% figRange = 50;
-% subplot(1,2,1); hold on
-% for hh = 1:nHues
-%     plot(hueCircle_lsTrichrom(1,hh),hueCircle_lsTrichrom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-% end
-% axis('square');
-% xlim([0.55 0.85]); ylim([0 0.30]);
-% xlabel('l'); ylabel('s');
-% title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)));
-% subplot(1,2,2); hold on
-% for hh = 1:nHues
-%     plot(hueCircle_lsAnom(1,hh),hueCircle_lsAnom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-% end
-% axis('square');
-% xlim([0.55 0.85]); ylim([0 0.30]);
-% xlabel('l'); ylabel('s');
-% title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)));
-
-%% MDS to get similarity representation
-%
-% Compute dissimilarity matrix. Start with interpoint distances.
-stimulusDistances_Trichrom = zeros(nHues,nHues);
-stimulusDistances_Anom = zeros(nHues,nHues);
-for i = 1:nHues
-    for j = 1:nHues
-         stimulusDistances_Trichrom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLTrichrom(:,i)-hueCircle_DKLTrichrom(:,j)));
-         stimulusDistances_Anom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLAnom(:,i)-hueCircle_DKLAnom(:,j)));
-    end
-end
-
-% % Now the MDS itself
-% analysisDimension = 2;
-% [mdsSolution_lsTrichrom,mdsStress_lsTrichrom,mdsDisparities_lsTrichrom] = mdscale(stimulusDistances_Trichrom,analysisDimension);
-% [mdsSolution_lsAnom,mdsStress_lsAnom,mdsDisparities_lsAnom] = mdscale(stimulusDistances_Anom,analysisDimension);
-% mdsSolution_lsTrichrom = mdsSolution_lsTrichrom';
-% mdsSolution_lsAnom = mdsSolution_lsAnom';
-
-%% LS plane plot of hue circle, with lines to closet neighbor.
-theFig = figure; clf; hold on
-set(gcf,'Position',[100 100 1100 650]);
-markerSize = 8;
-subplot(1,2,1); hold on
-set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-for hh = 1:nHues
-    [~,index] = sort(stimulusDistances_Anom(hh,:));
-    closestIndex = index(2);
-    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2);
-    closestIndex = index(3);
-    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2);
-    %if (closestIndex ~= hh+1 & closestIndex ~= hh-1 & ~(closestIndex == 1 & hh == nHues) & ~(closestIndex == nHues & hh == 1))
-    %end  
-end
-for hh = 1:nHues
-    plot(hueCircle_lsTrichrom(1,hh),hueCircle_lsTrichrom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-end
-xlim([0.60 0.75]); ylim([0 0.2]);
-set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
-set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
-xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
-axis('square');
-
-subplot(1,2,2); hold on
-set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-for hh = 1:nHues
-    [~,index] = sort(stimulusDistances_Anom(hh,:));
-    %closestIndex = index(2);
-    %plot([hueCircle_lsAnom(1,hh) hueCircle_lsAnom(1,closestIndex)],[hueCircle_lsAnom(2,hh) hueCircle_lsAnom(2,closestIndex)],'k','LineWidth',2);
-    %closestIndex = index(3)
-    %plot([hueCircle_lsAnom(1,hh) hueCircle_lsAnom(1,closestIndex)],[hueCircle_lsAnom(2,hh) hueCircle_lsAnom(2,closestIndex)],'k','LineWidth',2);
-end
-for hh = 1:nHues
-    plot(hueCircle_lsAnom(1,hh),hueCircle_lsAnom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-end
-xlim([0.60 0.75]); ylim([0 0.2]);
-set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70' '0.75'});
-set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
-xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
-axis('square');
-figParams.figName = sprintf('LS_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues);
-FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
-
-% %% Simulate our D100-like test
-% arrangeIndicesTrichrom(1) = 1;
-% arrangeIndicesAnom(1) = 1;
-% for hh = 2:nHues
-%     [~,index] = sort(stimulusDistances_Trichrom(arrangeIndicesTrichrom(hh-1),:));
-%     index1 = setdiff(index,arrangeIndicesTrichrom);
-%     arrangeIndicesTrichrom(hh) = index1(1);
-%     
-%     [~,index] = sort(stimulusDistances_Anom(arrangeIndicesAnom(hh-1),:));
-%     index1 = setdiff(index,arrangeIndicesAnom);
-%     arrangeIndicesAnom(hh) = index1(1);
-% end
-    
-% %% MDS plane plot of hue circle
-% theFig = figure; clf; hold on
-% markerSize = 8;
-% subplot(1,2,1); hold on
-% for hh = 1:nHues
-%     plot(mdsSolution_lsTrichrom(1,hh),mdsSolution_lsTrichrom(analysisDimension ,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-%     [~,index] = sort(stimulusDistances_lsTrichrom(hh,:));
-%     closestIndex = index(2);
-%     plot([mdsSolution_lsTrichrom(1,hh) mdsSolution_lsTrichrom(1,closestIndex)],[mdsSolution_lsTrichrom(2,hh) mdsSolution_lsTrichrom(2,closestIndex)],'k');
-%     closestIndex = index(3);
-%     plot([mdsSolution_lsTrichrom(1,hh) mdsSolution_lsTrichrom(1,closestIndex)],[mdsSolution_lsTrichrom(2,hh) mdsSolution_lsTrichrom(2,closestIndex)],'k');
-% end
-% %xlim([-0.1 0.1]); ylim([-0.05 0.05]);
-% xlabel('Dim 1'); ylabel('Dim 2');
-% title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)));
-% axis('square');
-% 
-% subplot(1,2,2); hold on
-% for hh = 1:nHues
-%     plot(mdsSolution_lsAnom(1,hh),mdsSolution_lsAnom(analysisDimension ,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
-%     [~,index] = sort(stimulusDistances_lsAnom(hh,:));
-%     closestIndex = index(2);
-%     plot([mdsSolution_lsAnom(1,hh) mdsSolution_lsAnom(1,closestIndex)],[mdsSolution_lsAnom(2,hh) mdsSolution_lsAnom(2,closestIndex)],'k');
-%     closestIndex = index(3);
-%     plot([mdsSolution_lsAnom(1,hh) mdsSolution_lsAnom(1,closestIndex)],[mdsSolution_lsAnom(2,hh) mdsSolution_lsAnom(2,closestIndex)],'k');
-% end
-% %xlim([-0.1 0.1]); ylim([-0.05 0.05]);
-% xlabel('Dim 1'); ylabel('Dim 2');
-% title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)));
-% axis('square');
-% figParams.figName = sprintf('MDS_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues);
-% FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
-
-%% Make the cone sensitivity figure
-figParams.figName = 'FigTrichromCones';
-figParams.xLimLow = 380;
-figParams.xLimHigh = 720;
-figParams.xTicks = [400 500 600 700];
-figParams.xTickLabels = {'400' '500' '600' '700'};
-figParams.yLimLow = -0.01;
-figParams.yLimHigh = 0.51;
-figParams.yTicks = [0.0 0.25 0.5];
-figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
-figParams.lineWidth = 5;
-theFig = figure; clf; hold on
-set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
-set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-plot(wls,T_conesQETrichrom(1,:)','r','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQETrichrom(2,:)','g','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQETrichrom(3,:)','b','LineWidth',figParams.lineWidth);
-xlim([figParams.xLimLow figParams.xLimHigh]);
-set(gca,'XTick',figParams.xTicks);
-set(gca,'XTickLabel',figParams.xTickLabels);
-xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylim([figParams.yLimLow figParams.yLimHigh]);
-ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-set(gca,'YTick',figParams.yTicks);
-set(gca,'YTickLabel',figParams.yTickLabels);
-legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
-axis('square');
-%set(gca,'XMinorTick','on');
-FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
-
-% and an anomalous version for explanatory purposes
-figParams.figName = 'FigTrichromAnomCones';
-figParams.xLimLow = 380;
-figParams.xLimHigh = 720;
-figParams.xTicks = [400 500 600 700];
-figParams.xTickLabels = {'400' '500' '600' '700'};
-figParams.yLimLow = -0.01;
-figParams.yLimHigh = 0.51;
-figParams.yTicks = [0.0 0.25 0.5];
-figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
-theFig = figure; clf; hold on
-set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
-set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-plot(wls,T_conesQEAnom(1,:)','r','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQEAnom(2,:)','y','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQEAnom(3,:)','b','LineWidth',figParams.lineWidth);
-xlim([figParams.xLimLow figParams.xLimHigh]);
-set(gca,'XTick',figParams.xTicks);
-set(gca,'XTickLabel',figParams.xTickLabels);
-xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-ylim([figParams.yLimLow figParams.yLimHigh]);
-ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-set(gca,'YTick',figParams.yTicks);
-set(gca,'YTickLabel',figParams.yTickLabels);
-legend({' L cones ' ' M'' cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
-axis('square');
-%set(gca,'XMinorTick','on');
-FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 cd(curDir);
 
