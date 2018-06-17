@@ -11,7 +11,7 @@ function varargout = FigColorDeficiency(varargin)
 %{
     tbUse({'BrainardLabBase'});
 %}
-   
+
 %% Clear
 clear; close all;
 
@@ -19,8 +19,8 @@ clear; close all;
 
 % Anomolous lambda-max
 %anomLambdaMax = [560 559 420.7]';
-anomLambdaMax = [535 530 420.7]';
-%anomLambdaMax = [540 530 420.7]';
+%anomLambdaMax = [535 530 420.7]';
+anomLambdaMax = [540 530 420.7]';
 %anomLambdaMax = [545 530 420.7]';
 %anomLambdaMax = [560 530 420.7]';
 
@@ -32,8 +32,11 @@ nHues = 60;
 % How l, s and Lum are weighted in distance calc
 lsLumWeights = [1 0.70 0.08];
 
-% Do notch filter?
-doNotch = 0;
+% Do notch filter? And params.
+doNotch = 1;
+notchLowWl = 520;
+notchHighWl = 535;
+notchDepth = 1;
 
 %% Hello
 mfiledir = fileparts(mfilename('fullpath'));
@@ -75,7 +78,20 @@ ptbPhotoreceptorsAnom = rmfield(ptbPhotoreceptorsAnom,'absorbance');
 ptbPhotoreceptorsAnom = FillInPhotoreceptors(ptbPhotoreceptorsAnom);
 T_conesQEAnom = [ptbPhotoreceptorsAnom.isomerizationAbsorptance(1,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(2,:) ; ptbPhotoreceptorsAnom.isomerizationAbsorptance(3,:)];
 
-%% Energy sensitivities.
+%% Notch filter
+if (doNotch)
+    notchFilter = zeros(size(wls));
+    index = find(wls >= notchLowWl & wls <= notchHighWl);
+    notchFilter(index) = 1;
+    notchFilter = notchFilter/max(notchFilter(:));
+    notchFilter = 1-notchDepth*notchFilter;
+    for ii = 1:3
+        T_conesQEAnom(ii,:) = T_conesQEAnom(ii,:).*notchFilter';
+    end
+end
+
+
+%% Energy sensitivities
 %
 % We need these to actually work with our energy unit inputs.
 T_conesTrichrom = EnergyToQuanta(S,T_conesQETrichrom')';
@@ -83,7 +99,7 @@ T_conesTrichrom = T_conesTrichrom/max(T_conesTrichrom(:));
 T_conesAnom = EnergyToQuanta(S,T_conesQEAnom')';
 T_conesAnom = T_conesAnom/max(T_conesAnom(:));
 
-% Generate hues around a hue circle
+%% Generate hues around a hue circle
 hueAngles = linspace(0,360,nHues+1);
 hueAngles = hueAngles(1:end-1);
 munsellData = MunsellPreprocessTable;
@@ -159,8 +175,8 @@ stimulusDistances_Trichrom = zeros(nHues,nHues);
 stimulusDistances_Anom = zeros(nHues,nHues);
 for i = 1:nHues
     for j = 1:nHues
-         stimulusDistances_Trichrom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLTrichrom(:,i)-hueCircle_DKLTrichrom(:,j)));
-         stimulusDistances_Anom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLAnom(:,i)-hueCircle_DKLAnom(:,j)));
+        stimulusDistances_Trichrom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLTrichrom(:,i)-hueCircle_DKLTrichrom(:,j)));
+        stimulusDistances_Anom(i,j) = norm(diag(lsLumWeights)*(hueCircle_DKLAnom(:,i)-hueCircle_DKLAnom(:,j)));
     end
 end
 
@@ -175,7 +191,7 @@ for hh = 1:nHues
     closestIndex = index(2);
     plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2);
     closestIndex = index(3);
-    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2); 
+    plot([hueCircle_lsTrichrom(1,hh) hueCircle_lsTrichrom(1,closestIndex)],[hueCircle_lsTrichrom(2,hh) hueCircle_lsTrichrom(2,closestIndex)],'k','LineWidth',2);
 end
 for hh = 1:nHues
     plot(hueCircle_lsTrichrom(1,hh),hueCircle_lsTrichrom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
@@ -228,7 +244,35 @@ ylim([figParams.yLimLow figParams.yLimHigh]);
 ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
-legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
+legend({' L' ' M' ' S'},'Location','NorthEast','FontSize',figParams.legendFontSize);
+axis('square');
+FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+
+%% Make deuteranope cone sensitivity figure
+figParams.figName = 'DeutanCones';
+figParams.xLimLow = 380;
+figParams.xLimHigh = 720;
+figParams.xTicks = [400 500 600 700];
+figParams.xTickLabels = {'400' '500' '600' '700'};
+figParams.yLimLow = -0.01;
+figParams.yLimHigh = 0.51;
+figParams.yTicks = [0.0 0.25 0.5];
+figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
+figParams.lineWidth = 5;
+theFig = figure; clf; hold on
+set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+plot(wls,T_conesQETrichrom(1,:)','r','LineWidth',figParams.lineWidth);
+plot(wls,T_conesQETrichrom(3,:)','b','LineWidth',figParams.lineWidth);
+xlim([figParams.xLimLow figParams.xLimHigh]);
+set(gca,'XTick',figParams.xTicks);
+set(gca,'XTickLabel',figParams.xTickLabels);
+xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylim([figParams.yLimLow figParams.yLimHigh]);
+ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+set(gca,'YTick',figParams.yTicks);
+set(gca,'YTickLabel',figParams.yTickLabels);
+legend({' L' ' S'},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
@@ -270,6 +314,34 @@ end
 axis('square');
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
+%% Plot notch filter
+if (doNotch)
+    figParams.figName = sprintf('NotchFilter',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),doNotch);
+    figParams.xLimLow = 380;
+    figParams.xLimHigh = 720;
+    figParams.xTicks = [400 500 600 700];
+    figParams.xTickLabels = {'400' '500' '600' '700'};
+    figParams.yLimLow = -0.01;
+    figParams.yLimHigh = 1.01;
+    figParams.yTicks = [0.0 0.25 0.5 0.75 1];
+    figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 ' ' 0.75 ' ' 1.00 '};
+    theFig = figure; clf; hold on
+    set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
+    set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
+    plot(wls,notchFilter,'k','LineWidth',figParams.lineWidth);
+    xlim([figParams.xLimLow figParams.xLimHigh]);
+    set(gca,'XTick',figParams.xTicks);
+    set(gca,'XTickLabel',figParams.xTickLabels);
+    xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+    ylim([figParams.yLimLow figParams.yLimHigh]);
+    ylabel('Filter Transmissivity','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+    set(gca,'YTick',figParams.yTicks);
+    set(gca,'YTickLabel',figParams.yTickLabels);
+    axis('square');
+    FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
+end
+
+
 % %% 3D plots in DKL
 % figure; clf; hold on
 % for hh = 1:nHues
@@ -278,7 +350,7 @@ FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParam
 % end
 % xlabel('l'); ylabel('s'); zlabel('Lum');
 % title('Normal Trichrom DKL');
-% 
+%
 % figure; clf; hold on
 % for hh = 1:nHues
 %     plot3(hueCircle_DKLAnom(1,hh),hueCircle_DKLAnom(2,hh),hueCircle_DKLAnom(3,hh), ...
@@ -286,7 +358,7 @@ FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParam
 % end
 % xlabel('l'); ylabel('s'); zlabel('Lum');
 % title('Anomolous DKL');
-% 
+%
 % figure; clf; hold on
 % for hh = 1:nHues
 %     plot3(hueCircle_LMSTrichrom(1,hh),hueCircle_LMSTrichrom(2,hh),hueCircle_LMSTrichrom(3,hh), ...
@@ -294,7 +366,7 @@ FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParam
 % end
 % xlabel('L'); ylabel('M'); zlabel('S');
 % title('Normal Trichrom LMS');
-% 
+%
 % figure; clf; hold on
 % for hh = 1:nHues
 %     plot3(hueCircle_LMSAnom(1,hh),hueCircle_LMSAnom(2,hh),hueCircle_LMSAnom(3,hh), ...
