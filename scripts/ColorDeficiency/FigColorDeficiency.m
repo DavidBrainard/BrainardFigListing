@@ -9,17 +9,20 @@ function varargout = FigColorDeficiency(varargin)
 % 6/13/17   dhb  Wrote it
 
 %{
-    tbUse({'isetbio', 'Psychtoolbox-3'});
+    tbUse({'BrainardLabBase'});
 %}
    
 %% Clear
-ieInit;
+clear; close all;
 
 %% Parameters
 
 % Anomolous lambda-max
-anomLambdaMax = [560 559 420.7]';
+%anomLambdaMax = [560 559 420.7]';
+anomLambdaMax = [535 530 420.7]';
 %anomLambdaMax = [540 530 420.7]';
+%anomLambdaMax = [545 530 420.7]';
+%anomLambdaMax = [560 530 420.7]';
 
 % Hue circle parameters
 munsellValue = 6;
@@ -28,6 +31,9 @@ nHues = 60;
 
 % How l, s and Lum are weighted in distance calc
 lsLumWeights = [1 0.70 0.08];
+
+% Do notch filter?
+doNotch = 0;
 
 %% Hello
 mfiledir = fileparts(mfilename('fullpath'));
@@ -162,7 +168,7 @@ end
 theFig = figure; clf; hold on
 set(gcf,'Position',[100 100 1100 650]);
 markerSize = 8;
-subplot(1,2,1); hold on
+subplot(1,2,2); hold on
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
 for hh = 1:nHues
     [~,index] = sort(stimulusDistances_Anom(hh,:));
@@ -179,10 +185,10 @@ set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70'
 set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
 xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(1),ptbPhotoreceptorsTrichrom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
+title({'Distance-Based' ; 'Confusions'},'FontName',figParams.fontName,'FontSize',figParams.titleFontSize-2);
 axis('square');
 
-subplot(1,2,2); hold on
+subplot(1,2,1); hold on
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
 for hh = 1:nHues
     plot(hueCircle_lsAnom(1,hh),hueCircle_lsAnom(2,hh),'o','Color',hueCircle_RGBTrichrom(:,hh),'MarkerFaceColor',hueCircle_RGBTrichrom(:,hh),'MarkerSize',markerSize);
@@ -192,13 +198,13 @@ set(gca,'XTick',[0.6 0.65 0.7 0.75]); set(gca,'XTickLabel',{'0.60' '0.65' '0.70'
 set(gca,'YTick',[0 0.05 0.1 0.15 0.2]); set(gca,'YTickLabel',{'0.00' '0.05' '0.10' '0.15' '0.20'});
 xlabel('red-green','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylabel('blue-yellow','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
-title(sprintf('L: %0.0f, M: %0.0f',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2)),'FontName',figParams.fontName,'FontSize',figParams.titleFontSize);
+title({'Cone-Based' ; 'Chromaticity'},'FontName',figParams.fontName,'FontSize',figParams.titleFontSize-2);
 axis('square');
-figParams.figName = sprintf('LS_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues);
+figParams.figName = sprintf('LS_%0.0f_%0.0f_%d_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),nHues,doNotch);
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 %% Make the cone sensitivity figure
-figParams.figName = 'FigTrichromCones';
+figParams.figName = 'TrichromCones';
 figParams.xLimLow = 380;
 figParams.xLimHigh = 720;
 figParams.xTicks = [400 500 600 700];
@@ -227,7 +233,7 @@ axis('square');
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
 %% And an anomalous version for explanatory purposes
-figParams.figName = 'FigTrichromAnomCones';
+figParams.figName = sprintf('AnomCones_%0.0f_%0.0f_%d',ptbPhotoreceptorsAnom.nomogram.lambdaMax(1),ptbPhotoreceptorsAnom.nomogram.lambdaMax(2),doNotch);
 figParams.xLimLow = 380;
 figParams.xLimHigh = 720;
 figParams.xTicks = [400 500 600 700];
@@ -239,9 +245,15 @@ figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 '};
 theFig = figure; clf; hold on
 set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-plot(wls,T_conesQEAnom(1,:)','r','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQEAnom(2,:)','y','LineWidth',figParams.lineWidth);
-plot(wls,T_conesQEAnom(3,:)','b','LineWidth',figParams.lineWidth);
+if (anomLambdaMax(1) == 560)
+    plot(wls,T_conesQEAnom(1,:)','r','LineWidth',figParams.lineWidth);
+    plot(wls,T_conesQEAnom(2,:)','y','LineWidth',figParams.lineWidth);
+    plot(wls,T_conesQEAnom(3,:)','b','LineWidth',figParams.lineWidth);
+else
+    plot(wls,T_conesQEAnom(1,:)','y','LineWidth',figParams.lineWidth);
+    plot(wls,T_conesQEAnom(2,:)','g','LineWidth',figParams.lineWidth);
+    plot(wls,T_conesQEAnom(3,:)','b','LineWidth',figParams.lineWidth);
+end
 xlim([figParams.xLimLow figParams.xLimHigh]);
 set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
@@ -250,7 +262,11 @@ ylim([figParams.yLimLow figParams.yLimHigh]);
 ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
-legend({' L cones ' ' M'' cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
+if (anomLambdaMax(1) == 560)
+    legend({' L' ' L''' ' S'},'Location','NorthEast','FontSize',figParams.legendFontSize);
+else
+    legend({' M''' ' M' ' S'},'Location','NorthEast','FontSize',figParams.legendFontSize);
+end
 axis('square');
 FigureSave(fullfile(outputDir,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
