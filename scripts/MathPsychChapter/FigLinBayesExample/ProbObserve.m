@@ -1,0 +1,1 @@
+function [u,K] = ProbObserve(reality,B,noiseK)% This follows from a little algebra and% the definitions of mean and variance.u = B*reality;K = B*noiseK*B';
