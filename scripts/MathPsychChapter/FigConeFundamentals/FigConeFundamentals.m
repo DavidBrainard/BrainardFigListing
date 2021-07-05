@@ -45,7 +45,6 @@ if (exist('../SecondaryFigParams','file'))
     cd(curDir);
 end
 
-
 %% Make the cone sensitivity figure
 figParams.figName = 'FigTrichromCones_2';
 figParams.xLimLow = 380;
