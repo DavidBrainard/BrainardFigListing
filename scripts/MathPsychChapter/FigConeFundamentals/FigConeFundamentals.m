@@ -66,12 +66,12 @@ set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
 xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylim([figParams.yLimLow figParams.yLimHigh]);
-ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('Excitation Probability','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
-title('Cone Sensitivities (2°)')
+title('Cone Fundamentals (2°)')
 %set(gca,'XMinorTick','on');
 FigureSave(fullfile(pwd,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
@@ -97,12 +97,12 @@ set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
 xlabel('Wavelength (nm)','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 ylim([figParams.yLimLow figParams.yLimHigh]);
-ylabel('Quantal Efficiency','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
+ylabel('Excitation Probability','FontName',figParams.fontName,'FontSize',figParams.labelFontSize);
 set(gca,'YTick',figParams.yTicks);
 set(gca,'YTickLabel',figParams.yTickLabels);
 legend({' L cones ' ' M cones ' ' S cones '},'Location','NorthEast','FontSize',figParams.legendFontSize);
 axis('square');
-title('Cone Sensitivities (10°)')
+title('Cone Fundamentals (10°)')
 %set(gca,'XMinorTick','on');
 FigureSave(fullfile(pwd,[mfilename '_' figParams.figName]),theFig,figParams.figType);
 
