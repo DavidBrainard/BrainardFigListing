@@ -58,9 +58,9 @@ figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 ' ' 0.75 '};
 theFig = figure; clf; hold on
 set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-plot(wls,T_quanta(1,:)','r','LineWidth',figParams.lineWidth);
-plot(wls,T_quanta(2,:)','g','LineWidth',figParams.lineWidth);
-plot(wls,T_quanta(3,:)','b','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(1,:)','Color',[0 0 0],'LineStyle','-','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(2,:)','Color',[0.4 0.4 0.4],'LineStyle','-','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(3,:)','Color',[0.7 0.7 0.7],'LineStyle','-','LineWidth',figParams.lineWidth);
 xlim([figParams.xLimLow figParams.xLimHigh]);
 set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
@@ -89,9 +89,9 @@ figParams.yTickLabels = {' 0.00 ' ' 0.25 ' ' 0.50 ' ' 0.75 '};
 theFig = figure; clf; hold on
 set(gcf,'Position',[100 100 figParams.sqSize figParams.sqSize]);
 set(gca,'FontName',figParams.fontName,'FontSize',figParams.axisFontSize,'LineWidth',figParams.axisLineWidth);
-plot(wls,T_quanta(1,:)','r','LineWidth',figParams.lineWidth);
-plot(wls,T_quanta(2,:)','g','LineWidth',figParams.lineWidth);
-plot(wls,T_quanta(3,:)','b','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(1,:)','Color',[0 0 0],'LineStyle','-','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(2,:)','Color',[0.4 0.4 0.4],'LineStyle','-','LineWidth',figParams.lineWidth);
+plot(wls,T_quanta(3,:)','Color',[0.7 0.7 0.7],'LineStyle','-','LineWidth',figParams.lineWidth);
 xlim([figParams.xLimLow figParams.xLimHigh]);
 set(gca,'XTick',figParams.xTicks);
 set(gca,'XTickLabel',figParams.xTickLabels);
