@@ -7,7 +7,7 @@ function varargout = FigTrichromMetam(varargin)
 %   Panel A: FigTrichromCones.pdf
 %   Panel B: FigTrichromMetam.pdf
 %
-% See also FigDichromMetam, FigSpatioCHromaticAliasing.
+% See also FigDichromMetam, FigSpatioChromaticAliasing.
 %
 % 3/23/15   dhb  Wrote it.
 % 4/20/15   dhb  Bring into the validation fold
